@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <id>dotnet-manage-secrets</id>
+        <version>0.1.0</version>
+        <description>Manage dotnet user-secrets via a JSON file using your default editor.</description>
+        <authors>Josh Brunton &lt;josh.brunton@proton.me&gt;</authors>
+
+        <projectUrl>https://github.com/brunt-toast/dotnet-manage-secrets</projectUrl>
+        <repository type="git" url="https://github.com/brunt-toast/dotnet-manage-secrets" />
+        <license type="expression">MIT</license>
+        <readme>.\README.md</readme>
+    </metadata>
+</package>
