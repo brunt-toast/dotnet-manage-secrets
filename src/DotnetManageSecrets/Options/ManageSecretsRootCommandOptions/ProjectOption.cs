@@ -8,9 +8,19 @@ internal class ProjectOption : Option<string>
 
     public ProjectOption() : base("--project", "-p")
     {
+        Validators.Add(PathExistsValidator);
         DefaultValueFactory = ValueFactory;
         Description = "A .csproj file, or a directory containing at least one .csproj file in its tree. " +
                       "In the case of multiple csproj files, a selection prompt wil appear. " +
                       "Pass --error-on-multiple-results to prevent this prompt.";
+    }
+
+    private void PathExistsValidator(OptionResult opt)
+    {
+        string? value = opt.GetValue(this);
+        if (!Path.Exists(value))
+        {
+            opt.AddError($"The path \"{value}\" does not exist.");
+        }
     }
 }
