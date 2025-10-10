@@ -3,6 +3,9 @@
 ##
 ## Get latest from `dotnet new gitignore`
 
+# nupkg folder
+nupkg/
+
 # dotenv files
 .env
 

@@ -4,9 +4,8 @@ using System.Text.RegularExpressions;
 
 namespace Dev.JoshBrunton.DotnetManageSecrets;
 
-internal partial class Program
+internal class Program
 {
-
     public static void Main(string[] args)
     {
         ArgsHelper argsHelper = new(args);
@@ -21,7 +20,7 @@ internal partial class Program
             }
         }
 
-        string project = ProjectResolver.GetProject(args);
+        string project = ProjectResolver.GetProject(argsHelper);
         if (!DotnetUserSecretsHelper.TryGetSecretsId(project, out string? guid))
         {
             Console.Error.WriteLine("Couldn't get a single secrets ID from the chosen project. Expected exactly one <UserSecretsId> node containing a GUID.");

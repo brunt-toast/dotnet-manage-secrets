@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics.CodeAnalysis;
 
 namespace Dev.JoshBrunton.DotnetManageSecrets;
 
@@ -18,7 +13,7 @@ internal class ArgsHelper
 
     public bool TryGetValue(string key, [MaybeNullWhen(false)] out string value)
     {
-        int keyIndex = _args.IndexOf("key");
+        int keyIndex = _args.IndexOf(key);
 
         if (keyIndex == -1 || _args.Count < keyIndex + 2)
         {

@@ -20,7 +20,7 @@ Task("Build")
 Task("Pack")
     .IsDependentOn("Build")
     .Does(() => {
-        DotNetPack("./src/DotnetManageSecrets.Console", new DotNetPackSettings() 
+        DotNetPack("./src/DotnetManageSecrets", new DotNetPackSettings() 
         {
             Configuration = "Release"
         });
