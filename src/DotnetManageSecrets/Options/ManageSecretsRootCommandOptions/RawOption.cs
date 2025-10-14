@@ -11,7 +11,7 @@ internal class RawOption : Option<bool>
 {
     private bool ValueFactory(ArgumentResult _) => false;
 
-    public RawOption() : base("raw", "r")
+    public RawOption() : base("--raw", "-r")
     {
         DefaultValueFactory = ValueFactory;
         Description = "Instead of creating a temporary file and applying a transformation for nested JSON, directly edit the file owned by dotnet.";

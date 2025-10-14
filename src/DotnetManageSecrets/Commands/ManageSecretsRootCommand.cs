@@ -8,11 +8,19 @@ namespace Dev.JoshBrunton.DotnetManageSecrets.Commands;
 
 internal class ManageSecretsRootCommand : RootCommand
 {
+    private const string ConstDescription = """
+                                       Manage dotnet user secrets as JSON with the editor of your choice. 
+                                       
+                                       This program reads the user secrets ID of a given C# project and looks for the associated file in your user secrets folder. It formats the secrets as nested JSON (rather than the flattened JSON on disk), re-formatting and saving the result once you close your editor. 
+                                       
+                                       While editing, a copy of the secrets is stored in the system's temp directory. The file is deleted immediately after closing the editor and loading the new values into memory.
+                                       """;
+
     private readonly ProjectOption _project = new();
     private readonly EditorOption _editor = new();
     private readonly RawOption _raw = new();
 
-    public ManageSecretsRootCommand() : base("Secrets manager")
+    public ManageSecretsRootCommand() : base(CharsHelper.TrimLines(ConstDescription))
     {
         Options.Add(_project);
         Options.Add(_editor);
