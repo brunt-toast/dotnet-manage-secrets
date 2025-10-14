@@ -10,11 +10,13 @@ internal class ManageSecretsRootCommand : RootCommand
 {
     private readonly ProjectOption _project = new();
     private readonly EditorOption _editor = new();
+    private readonly RawOption _raw = new();
 
     public ManageSecretsRootCommand() : base("Secrets manager")
     {
         Options.Add(_project);
         Options.Add(_editor);
+        Options.Add(_raw);
         SetAction(ExecuteAction);
     }
 
@@ -60,17 +62,26 @@ internal class ManageSecretsRootCommand : RootCommand
             Environment.Exit(ExitCodes.SecretsFileNotFound);
         }
 
-        string dirtyJson = File.ReadAllText(secretsFilePath);
-        string cleanJson = JsonHelper.Clean(dirtyJson);
+        bool doRaw = parseResult.GetValue(_raw);
 
-        string tmpFileName = Path.Join(Path.GetTempPath(), $"{Guid.NewGuid()}.json");
-        File.Create(tmpFileName).Dispose();
-        File.WriteAllText(tmpFileName, cleanJson);
+        string targetFileName;
+        if (doRaw)
+        {
+            targetFileName = secretsFilePath;
+        }
+        else
+        {
+            string dirtyJson = File.ReadAllText(secretsFilePath);
+            string cleanJson = JsonHelper.Clean(dirtyJson);
+            targetFileName = Path.Join(Path.GetTempPath(), $"{Guid.NewGuid()}.json");
+            File.Create(targetFileName).Dispose();
+            File.WriteAllText(targetFileName, cleanJson);
+        }
 
         ProcessStartInfo psi = new()
         {
             FileName = editor,
-            ArgumentList = { tmpFileName }
+            ArgumentList = { targetFileName }
         };
         using Process? proc = Process.Start(psi);
         if (proc is null)
@@ -81,10 +92,13 @@ internal class ManageSecretsRootCommand : RootCommand
 
         proc.WaitForExit();
 
-        var outJson = File.ReadAllText(tmpFileName);
-        File.Delete(tmpFileName);
-        string jsonToDump = JsonHelper.Smudge(outJson);
-        File.WriteAllText(secretsFilePath, jsonToDump);
+        if (!doRaw)
+        {
+            var outJson = File.ReadAllText(targetFileName);
+            File.Delete(targetFileName);
+            string jsonToDump = JsonHelper.Smudge(outJson);
+            File.WriteAllText(secretsFilePath, jsonToDump);
+        }
 
         return ExitCodes.Success;
     }
