@@ -15,4 +15,5 @@ internal static class ExitCodes
     public const int EditorNotFound = 4;
     public const int ProjectNotRegisteredForUserSecrets = 5;
     public const int FailedToStartEditor = 6;
+    public const int SecretsFileNotFound = 7;
 }

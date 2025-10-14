@@ -1,6 +1,7 @@
 ﻿using System.CommandLine;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using Dev.JoshBrunton.DotnetManageSecrets.Helpers;
 using Dev.JoshBrunton.DotnetManageSecrets.Options.ManageSecretsRootCommandOptions;
 
 namespace Dev.JoshBrunton.DotnetManageSecrets.Commands;
@@ -55,13 +56,21 @@ internal class ManageSecretsRootCommand : RootCommand
 
         if (!File.Exists(secretsFilePath))
         {
-            File.Create(secretsFilePath);
+            Console.Error.WriteLine($"Project '{csprojPath}' is registered with secrets ID {guid}, but the file '{secretsFilePath}' was not found.");
+            Environment.Exit(ExitCodes.SecretsFileNotFound);
         }
+
+        string dirtyJson = File.ReadAllText(secretsFilePath);
+        string cleanJson = JsonHelper.Clean(dirtyJson);
+
+        string tmpFileName = Path.Join(Path.GetTempPath(), $"{Guid.NewGuid()}.json");
+        File.Create(tmpFileName).Dispose();
+        File.WriteAllText(tmpFileName, cleanJson);
 
         ProcessStartInfo psi = new()
         {
             FileName = editor,
-            ArgumentList = { secretsFilePath }
+            ArgumentList = { tmpFileName }
         };
         using Process? proc = Process.Start(psi);
         if (proc is null)
@@ -71,6 +80,12 @@ internal class ManageSecretsRootCommand : RootCommand
         }
 
         proc.WaitForExit();
+
+        var outJson = File.ReadAllText(tmpFileName);
+        File.Delete(tmpFileName);
+        string jsonToDump = JsonHelper.Smudge(outJson);
+        File.WriteAllText(secretsFilePath, jsonToDump);
+
         return ExitCodes.Success;
     }
 
