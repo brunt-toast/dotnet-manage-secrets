@@ -4,7 +4,7 @@ using System.CommandLine.Parsing;
 namespace Dev.JoshBrunton.DotnetManageSecrets.Options.ManageSecretsRootCommandOptions;
 internal class EditorOption : Option<string>
 {
-    private string ValueFactory(ArgumentResult _) => Environment.GetEnvironmentVariable("EDITOR") ?? "";
+    private static string ValueFactory(ArgumentResult _) => Environment.GetEnvironmentVariable("EDITOR") ?? "";
     
     public EditorOption() : base("--editor", "-e")
     {

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Dev.JoshBrunton.DotnetManageSecrets.Options.ManageSecretsRootCommandOptions;
 internal class RawOption : Option<bool>
 {
-    private bool ValueFactory(ArgumentResult _) => false;
+    private static bool ValueFactory(ArgumentResult _) => false;
 
     public RawOption() : base("--raw", "-r")
     {

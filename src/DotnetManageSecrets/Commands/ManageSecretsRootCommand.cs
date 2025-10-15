@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using Dev.JoshBrunton.DotnetManageSecrets.Arguments.ManageSecretsRootCommandArguments;
 using Dev.JoshBrunton.DotnetManageSecrets.Consts;
 using Dev.JoshBrunton.DotnetManageSecrets.Extensions.System;
+using Dev.JoshBrunton.DotnetManageSecrets.Extensions.System.IO;
 using Dev.JoshBrunton.DotnetManageSecrets.Options.ManageSecretsRootCommandOptions;
 using Dev.JoshBrunton.DotnetManageSecrets.Services;
 
@@ -33,8 +34,24 @@ internal class ManageSecretsRootCommand : RootCommand
         Options.Add(_editor);
         Options.Add(_raw);
         Arguments.Add(_leftovers);
-
         SetAction(ExecuteAction);
+    }
+
+    public int Execute(string[] args)
+    {
+        string[] autoRspArgs;
+        string defaultRspPath = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config", "dotnet-manage-secrets.rsp");
+        if (File.Exists(defaultRspPath))
+        {
+            string content = File.ReadAllText(defaultRspPath);
+            autoRspArgs = System.CommandLine.Parsing.CommandLineParser.SplitCommandLine(content).ToArray();
+        }
+        else
+        {
+            autoRspArgs = [];
+        }
+
+        return Parse([.. args, .. autoRspArgs]).Invoke();
     }
 
     private int ExecuteAction(ParseResult parseResult)
@@ -91,7 +108,7 @@ internal class ManageSecretsRootCommand : RootCommand
             string dirtyJson = File.ReadAllText(secretsFilePath);
             string cleanJson = JsonFilter.Clean(dirtyJson);
             targetFileName = Path.Join(Path.GetTempPath(), $"{Guid.NewGuid()}.json");
-            File.Create(targetFileName).Dispose();
+            FileExtensions.CreateWithoutLease(targetFileName);
             File.WriteAllText(targetFileName, cleanJson);
         }
 

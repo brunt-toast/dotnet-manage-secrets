@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Dev.JoshBrunton.DotnetManageSecrets.Arguments.ManageSecretsRootCommandArguments;
 internal class LeftoversArgument : Argument<List<string>>
 {
-    private List<string> ValueFactory(ArgumentResult arg) => [];
+    private static List<string> ValueFactory(ArgumentResult _) => [];
 
     public LeftoversArgument() : base("editorArgs")
     {

@@ -4,7 +4,7 @@ using System.CommandLine.Parsing;
 namespace Dev.JoshBrunton.DotnetManageSecrets.Options.ManageSecretsRootCommandOptions;
 internal class ProjectOption : Option<string>
 {
-    private string ValueFactory(ArgumentResult _) => Directory.GetCurrentDirectory();
+    private static string ValueFactory(ArgumentResult _) => Directory.GetCurrentDirectory();
 
     public ProjectOption() : base("--project", "-p")
     {
