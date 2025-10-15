@@ -11,8 +11,7 @@ internal class ProjectOption : Option<string>
         Validators.Add(PathExistsValidator);
         DefaultValueFactory = ValueFactory;
         Description = "A .csproj file, or a directory containing at least one .csproj file in its tree. " +
-                      "In the case of multiple csproj files, a selection prompt wil appear. " +
-                      "Pass --error-on-multiple-results to prevent this prompt.";
+                      "In the case of multiple csproj files, a selection prompt wil appear. ";
     }
 
     private void PathExistsValidator(OptionResult opt)
