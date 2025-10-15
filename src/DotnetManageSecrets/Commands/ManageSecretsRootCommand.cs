@@ -16,6 +16,8 @@ internal class ManageSecretsRootCommand : RootCommand
                                        This program reads the user secrets ID of a given C# project and looks for the associated file in your user secrets folder. It formats the secrets as nested JSON (rather than the flattened JSON on disk), re-formatting and saving the result once you close your editor. 
                                        
                                        While editing, a copy of the secrets is stored in the system's temp directory. The file is deleted immediately after closing the editor and loading the new values into memory.
+                                       
+                                       TIP: You can configure default arguments to this command by using the file ~/.config/dotnet-manage-secrets.rsp. 
                                        """;
 
     private readonly ProjectOption _project = new();
