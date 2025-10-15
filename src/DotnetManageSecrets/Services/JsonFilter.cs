@@ -1,8 +1,9 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace Dev.JoshBrunton.DotnetManageSecrets.Helpers;
-internal static class JsonHelper
+namespace Dev.JoshBrunton.DotnetManageSecrets.Services;
+
+internal static class JsonFilter
 {
     public static string Clean(string json)
     {
@@ -27,7 +28,6 @@ internal static class JsonHelper
         string[] parts = qualifiedKey.Split('.');
         JObject current = obj;
 
-        // Walk through all but the last part, creating intermediate objects as needed
         for (int i = 0; i < parts.Length - 1; i++)
         {
             string part = parts[i];

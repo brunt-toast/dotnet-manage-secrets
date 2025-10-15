@@ -3,8 +3,10 @@ using System.CommandLine;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Dev.JoshBrunton.DotnetManageSecrets.Arguments.ManageSecretsRootCommandArguments;
-using Dev.JoshBrunton.DotnetManageSecrets.Helpers;
+using Dev.JoshBrunton.DotnetManageSecrets.Consts;
+using Dev.JoshBrunton.DotnetManageSecrets.Extensions.System;
 using Dev.JoshBrunton.DotnetManageSecrets.Options.ManageSecretsRootCommandOptions;
+using Dev.JoshBrunton.DotnetManageSecrets.Services;
 
 namespace Dev.JoshBrunton.DotnetManageSecrets.Commands;
 
@@ -25,7 +27,7 @@ internal class ManageSecretsRootCommand : RootCommand
     private readonly RawOption _raw = new();
     private readonly LeftoversArgument _leftovers = new();
 
-    public ManageSecretsRootCommand() : base(CharsHelper.TrimLines(ConstDescription))
+    public ManageSecretsRootCommand() : base(ConstDescription.WrapLongLines())
     {
         Options.Add(_project);
         Options.Add(_editor);
@@ -49,7 +51,7 @@ internal class ManageSecretsRootCommand : RootCommand
             return ExitCodes.EditorNotFound;
         }
 
-        int gotProject = TryGetCsprojPath(parseResult, out string? csprojPath);
+        int gotProject = ProjectLocator.TryGetCsprojPath(parseResult, _project, out string? csprojPath);
         if (gotProject != 0)
         {
             return gotProject;
@@ -61,7 +63,7 @@ internal class ManageSecretsRootCommand : RootCommand
             return ExitCodes.UnknownError;
         }
 
-        if (!DotnetUserSecretsHelper.TryGetSecretsId(csprojPath, out string? guid))
+        if (!UserSecretsIdReader.TryGetSecretsId(csprojPath, out string? guid))
         {
             Console.Error.WriteLine("Couldn't get a single secrets ID from the chosen project. Expected exactly one <UserSecretsId> node containing a GUID.");
             return ExitCodes.ProjectNotRegisteredForUserSecrets;
@@ -87,7 +89,7 @@ internal class ManageSecretsRootCommand : RootCommand
         else
         {
             string dirtyJson = File.ReadAllText(secretsFilePath);
-            string cleanJson = JsonHelper.Clean(dirtyJson);
+            string cleanJson = JsonFilter.Clean(dirtyJson);
             targetFileName = Path.Join(Path.GetTempPath(), $"{Guid.NewGuid()}.json");
             File.Create(targetFileName).Dispose();
             File.WriteAllText(targetFileName, cleanJson);
@@ -97,7 +99,7 @@ internal class ManageSecretsRootCommand : RootCommand
         {
             FileName = editor,
         };
-        
+
         psi.ArgumentList.Add(targetFileName);
         foreach (var arg in parseResult.GetValue(_leftovers) ?? [])
         {
@@ -117,88 +119,10 @@ internal class ManageSecretsRootCommand : RootCommand
         {
             var outJson = File.ReadAllText(targetFileName);
             File.Delete(targetFileName);
-            string jsonToDump = JsonHelper.Smudge(outJson);
+            string jsonToDump = JsonFilter.Smudge(outJson);
             File.WriteAllText(secretsFilePath, jsonToDump);
         }
 
         return ExitCodes.Success;
-    }
-
-    private int TryGetCsprojPath(ParseResult parseResult, out string? csprojPath)
-    {
-        csprojPath = null;
-
-        if (parseResult.GetValue(_project) is not { } projectPath)
-        {
-            Console.Error.WriteLine("The project path could not be found.");
-            return ExitCodes.UnknownError;
-        }
-
-        if (File.Exists(projectPath))
-        {
-            csprojPath = projectPath;
-            return ExitCodes.Success;
-        }
-
-        if (Directory.Exists(projectPath))
-        {
-            if (TryGetCsprojFromDirectory(projectPath, out csprojPath))
-            {
-                return ExitCodes.Success;
-            }
-
-            Console.Error.WriteLine($"Couldn't find any .csproj files with user secrets enabled under directory {projectPath}");
-            return ExitCodes.NoMatchingFiles;
-
-        }
-
-        Console.Error.WriteLine($"\"{_project.Name}\" is not a file or directory.");
-        return ExitCodes.DirectoryNotFound;
-    }
-
-    private bool TryGetCsprojFromDirectory(string directory, out string? path)
-    {
-        path = null;
-
-        string[] projects = Directory.GetFiles(directory, "*.csproj", SearchOption.AllDirectories)
-        .Where(x => DotnetUserSecretsHelper.TryGetSecretsId(x, out _))
-        .ToArray();
-
-        if (projects.Length == 0)
-        {
-            return false;
-        }
-
-        if (projects.Length == 1)
-        {
-            path = projects[0];
-            return true;
-        }
-
-        Console.WriteLine("Multiple viable .csproj files. Did you mean...");
-        for (int i = 0; i < projects.Length; i++)
-        {
-            Console.WriteLine($"[{i + 1}] {projects[i]}");
-        }
-
-        do
-        {
-            Console.WriteLine("Pick an option (default=1): ");
-            string? choiceString = Console.ReadLine();
-
-            if (string.IsNullOrWhiteSpace(choiceString))
-            {
-                path = projects[0];
-                return true;
-            }
-
-            if (int.TryParse(choiceString, out int choiceInt) && choiceInt <= projects.Length)
-            {
-                path = projects[choiceInt - 1];
-                return true;
-            }
-
-            Console.Error.WriteLine($"[{choiceString}] is not a valid option.");
-        } while (true);
     }
 }

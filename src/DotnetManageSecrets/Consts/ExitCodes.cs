@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Dev.JoshBrunton.DotnetManageSecrets;
+﻿namespace Dev.JoshBrunton.DotnetManageSecrets.Consts;
 internal static class ExitCodes
 {
     public const int UnknownError = -1;

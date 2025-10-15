@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
-namespace Dev.JoshBrunton.DotnetManageSecrets;
-internal static partial class DotnetUserSecretsHelper
+namespace Dev.JoshBrunton.DotnetManageSecrets.Services;
+internal static partial class UserSecretsIdReader
 {
     [GeneratedRegex(@"<UserSecretsId>([a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12})</UserSecretsId>", RegexOptions.Compiled)]
     private static partial Regex UserSecretsIdDeclarationRegex();
