@@ -10,8 +10,10 @@ internal class EditorOption : Option<string>
     {
         Validators.Add(ValueIsInvokableBinaryValidator);
         DefaultValueFactory = ValueFactory;
-        Description = "The command to invoke the editor. This can be a relative path, fully qualified path, or executable in $PATH. " +
-                      "Accepts the executable name only - no additional args.";
+        Description = """
+                      The command to invoke the editor. This can be a relative path, fully qualified path, or executable in $PATH. 
+                      Shell aliases are not supported.
+                      """;
     }
 
     private void ValueIsInvokableBinaryValidator(OptionResult opt)

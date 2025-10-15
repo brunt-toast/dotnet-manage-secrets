@@ -1,6 +1,8 @@
-﻿using System.CommandLine;
+﻿using System.Collections.ObjectModel;
+using System.CommandLine;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using Dev.JoshBrunton.DotnetManageSecrets.Arguments.ManageSecretsRootCommandArguments;
 using Dev.JoshBrunton.DotnetManageSecrets.Helpers;
 using Dev.JoshBrunton.DotnetManageSecrets.Options.ManageSecretsRootCommandOptions;
 
@@ -19,12 +21,15 @@ internal class ManageSecretsRootCommand : RootCommand
     private readonly ProjectOption _project = new();
     private readonly EditorOption _editor = new();
     private readonly RawOption _raw = new();
+    private readonly LeftoversArgument _leftovers = new();
 
     public ManageSecretsRootCommand() : base(CharsHelper.TrimLines(ConstDescription))
     {
         Options.Add(_project);
         Options.Add(_editor);
         Options.Add(_raw);
+        Arguments.Add(_leftovers);
+
         SetAction(ExecuteAction);
     }
 
@@ -89,8 +94,14 @@ internal class ManageSecretsRootCommand : RootCommand
         ProcessStartInfo psi = new()
         {
             FileName = editor,
-            ArgumentList = { targetFileName }
         };
+        
+        psi.ArgumentList.Add(targetFileName);
+        foreach (var arg in parseResult.GetValue(_leftovers) ?? [])
+        {
+            psi.ArgumentList.Add(arg);
+        }
+
         using Process? proc = Process.Start(psi);
         if (proc is null)
         {

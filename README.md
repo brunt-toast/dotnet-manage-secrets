@@ -1,8 +1,7 @@
 
-# Install Locally
-```
-dotnet cake
-dotnet tool install -g --add-source ./src/DotnetManageSecrets/bin/nupkg DotnetManageSecrets
+# Quick Install/Upgrade
+```bash
+dotnet tool uninstall -g DotnetManageSecrets; dotnet cake && dotnet tool install -g --add-source ./src/DotnetManageSecrets/bin/nupkg DotnetManageSecrets
 ```
 
 # Publish 
