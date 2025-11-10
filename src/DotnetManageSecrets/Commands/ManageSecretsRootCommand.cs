@@ -98,6 +98,7 @@ internal class ManageSecretsRootCommand : RootCommand
             DataFormats.Json => new JsonFilter(),
             DataFormats.FlatJson => new NoopFilter(),
             DataFormats.Yaml => new YamlFilter(),
+            DataFormats.Xml => new XmlFilter(),
             _ => throw new ArgumentOutOfRangeException()
         };
 
@@ -107,6 +108,7 @@ internal class ManageSecretsRootCommand : RootCommand
         {
             DataFormats.Json or DataFormats.FlatJson => "json",
             DataFormats.Yaml => "yml",
+            DataFormats.Xml => "xml",
             _ => throw new ArgumentOutOfRangeException()
         };
         string targetFileName = Path.Join(Path.GetTempPath(), $"{Guid.NewGuid()}.{fileFormat}");
