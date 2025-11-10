@@ -11,6 +11,15 @@ Manage your .NET user secrets using your format and editor of choice!
 [![FreeBSD](https://img.shields.io/badge/FreeBSD-AB2B28?logo=freebsd&logoColor=fff)](#)
 [![NuGet](https://img.shields.io/badge/NuGet-004880?logo=nuget&logoColor=fff)](#)
 
+## Installation
+
+Install as a .NET tool: 
+```sh
+dotnet tool install -g DotnetManageSecrets
+```
+
+## About
+
 [User Secrets](https://learn.microsoft.com/en-us/aspnet/core/security/app-secrets) are a great tool to manage sensitive configuration options while minimising the risk of accidentally committing them to version control, but the `dotnet user-secrets` command can be unintuitive and slow to use. 
 
 This tool is inspired by the Visual Studio secrets editor, which allows you to edit the underlying secrets file (`~/.microsoft/usersecrets/<GUID>/secrets.json`) directly, but only using its native "flattened json" format, and only for project types supported by the Connected Services feature. 
@@ -28,14 +37,6 @@ Additionally, it extends compatibility to all major editors - just set `$EDITOR`
 
 ![Using Visual Studio to edit user secrets in YAML format](assets/dotnetManageSecretsNvim.png)
 <sup>Legend has it that this author was stuck in vim forever more...</sup>
-
-## Quick Install/Upgrade
-
-We're not available as a tool on NuGet or other package managers yet. Install the tool manually by compiling from source: 
-
-```bash
-dotnet tool uninstall -g DotnetManageSecrets; dotnet cake && dotnet tool install -g --add-source ./src/DotnetManageSecrets/bin/nupkg DotnetManageSecrets
-```
 
 ## License 
 
