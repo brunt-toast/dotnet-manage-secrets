@@ -5,5 +5,6 @@ internal enum DataFormats
     Json,
     FlatJson,
     Yaml,
-    Xml
+    Xml,
+    Toml
 }
