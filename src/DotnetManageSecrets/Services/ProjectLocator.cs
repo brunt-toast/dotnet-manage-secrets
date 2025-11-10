@@ -77,7 +77,7 @@ internal static class ProjectLocator
                 return true;
             }
 
-            if (int.TryParse(choiceString, out int choiceInt) && choiceInt <= projects.Length)
+            if (int.TryParse(choiceString, out int choiceInt) && choiceInt > 0 && choiceInt <= projects.Length)
             {
                 path = projects[choiceInt - 1];
                 return true;
