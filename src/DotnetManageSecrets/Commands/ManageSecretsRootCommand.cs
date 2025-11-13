@@ -16,15 +16,16 @@ namespace Dev.JoshBrunton.DotnetManageSecrets.Commands;
 internal class ManageSecretsRootCommand : RootCommand
 {
     private const string ConstDescription = """
-                                       Manage dotnet user secrets as JSON with the editor of your choice. 
+                                       Manage dotnet user secrets with your editor and format of choice. 
                                        
-                                       This program reads the user secrets ID of a given C# project and looks for the associated file in your user secrets folder. It formats the secrets as nested JSON (rather than the flattened JSON on disk), re-formatting and saving the result once you close your editor. 
+                                       This program reads the user secrets ID of a given C# project and looks for the associated file in the user secrets folder. It reads the secrets into a sensible format and presents them using the configured editor, then re-formats the edited file into .NET's expected schema before saving. 
                                        
-                                       While editing, a copy of the secrets is stored in the system's temp directory. The file is deleted immediately after closing the editor and loading the new values into memory.
+                                       While editing, a copy of the secrets is stored in the system's temp directory. The file is deleted immediately after closing the editor and loading the new values into memory. Note that the file may persist if the program is not allowed to exit gracefully.
                                        
                                        TIP: You can configure default arguments to this command by using the file ~/.config/dotnet-manage-secrets.rsp. 
                                        """;
 
+    private readonly ReadonlyFlag _readonly = new();
     private readonly ProjectOption _project = new();
     private readonly EditorOption _editor = new();
     private readonly FormatOption _format = new();
@@ -32,6 +33,7 @@ internal class ManageSecretsRootCommand : RootCommand
 
     public ManageSecretsRootCommand() : base(ConstDescription)
     {
+        Options.Add(_readonly);
         Options.Add(_project);
         Options.Add(_editor);
         Options.Add(_format);
@@ -64,10 +66,10 @@ internal class ManageSecretsRootCommand : RootCommand
             return ExitCodes.EditorNotFound;
         }
 
-        int gotProject = ProjectLocator.TryGetCsprojPath(parseResult, _project, out string? csprojPath);
-        if (gotProject != 0)
+        int didFindProject = ProjectLocator.TryGetCsprojPath(parseResult, _project, out string? csprojPath);
+        if (didFindProject != 0)
         {
-            return gotProject;
+            return didFindProject;
         }
 
         if (csprojPath is null)
@@ -88,8 +90,8 @@ internal class ManageSecretsRootCommand : RootCommand
 
         if (!File.Exists(secretsFilePath))
         {
-            Console.Error.WriteLine($"Project '{csprojPath}' is registered with secrets ID {guid}, but the file '{secretsFilePath}' was not found.");
-            Environment.Exit(ExitCodes.SecretsFileNotFound);
+            FileExtensions.CreateWithoutLease(secretsFilePath);
+            File.WriteAllText(secretsFilePath, "{}");
         }
 
         DataFormats format = parseResult.GetValue(_format);
@@ -103,8 +105,15 @@ internal class ManageSecretsRootCommand : RootCommand
             _ => throw new ArgumentOutOfRangeException()
         };
 
-        string dirtyJson = File.ReadAllText(secretsFilePath);
-        string cleanJson = filter.Clean(dirtyJson);
+        string jsonFromSecretsFile = File.ReadAllText(secretsFilePath);
+        string contentForEdit = filter.Clean(jsonFromSecretsFile);
+
+        if (parseResult.GetValue(_readonly))
+        {
+            Console.WriteLine(contentForEdit);
+            return 0;
+        }
+
         string fileFormat = format switch
         {
             DataFormats.Json or DataFormats.FlatJson => "json",
@@ -113,16 +122,16 @@ internal class ManageSecretsRootCommand : RootCommand
             DataFormats.Toml => "toml",
             _ => throw new ArgumentOutOfRangeException()
         };
-        string targetFileName = Path.Join(Path.GetTempPath(), $"{Guid.NewGuid()}.{fileFormat}");
-        FileExtensions.CreateWithoutLease(targetFileName);
-        File.WriteAllText(targetFileName, cleanJson);
+        string editingFileName = Path.Join(Path.GetTempPath(), $"{Guid.NewGuid()}.{fileFormat}");
+        FileExtensions.CreateWithoutLease(editingFileName);
+        File.WriteAllText(editingFileName, contentForEdit);
 
         ProcessStartInfo psi = new()
         {
             FileName = editor,
         };
 
-        psi.ArgumentList.Add(targetFileName);
+        psi.ArgumentList.Add(editingFileName);
         foreach (var arg in parseResult.GetValue(_leftovers) ?? [])
         {
             psi.ArgumentList.Add(arg);
@@ -137,9 +146,9 @@ internal class ManageSecretsRootCommand : RootCommand
 
         proc.WaitForExit();
 
-        var outJson = File.ReadAllText(targetFileName);
-        File.Delete(targetFileName);
-        string jsonToDump = filter.Smudge(outJson);
+        var contentFromEditor = File.ReadAllText(editingFileName);
+        File.Delete(editingFileName);
+        string jsonToDump = filter.Smudge(contentFromEditor);
         File.WriteAllText(secretsFilePath, jsonToDump);
 
         return ExitCodes.Success;

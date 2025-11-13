@@ -3,7 +3,7 @@
     <CsprojName>$([System.IO.Path]::GetFileNameWithoutExtension($(MSBuildProjectFile)))</CsprojName>
     <RootNamespace>Dev.JoshBrunton.$(CsprojName)</RootNamespace>
 
-    <Version>0.2.1</Version>
+    <Version>0.3.0</Version>
     <Deterministic>true</Deterministic>
   </PropertyGroup>
 </Project>
