@@ -74,7 +74,7 @@ internal class ManageSecretsRootCommand : RootCommand
 
         if (csprojPath is null)
         {
-            Console.Error.WriteLine("Couldn't find a .csproj file");
+            Console.Error.WriteLine($"The task {nameof(ProjectLocator.TryGetCsprojPath)} suggested it succeeded, but its output was null.");
             return ExitCodes.UnknownError;
         }
 
