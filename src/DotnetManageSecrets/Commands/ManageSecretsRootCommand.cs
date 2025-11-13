@@ -90,8 +90,8 @@ internal class ManageSecretsRootCommand : RootCommand
 
         if (!File.Exists(secretsFilePath))
         {
-            Console.Error.WriteLine($"Project '{csprojPath}' is registered with secrets ID {guid}, but the file '{secretsFilePath}' was not found.");
-            Environment.Exit(ExitCodes.SecretsFileNotFound);
+            FileExtensions.CreateWithoutLease(secretsFilePath);
+            File.WriteAllText(secretsFilePath, "{}");
         }
 
         DataFormats format = parseResult.GetValue(_format);
