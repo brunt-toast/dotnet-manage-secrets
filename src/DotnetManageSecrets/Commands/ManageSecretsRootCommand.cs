@@ -25,6 +25,7 @@ internal class ManageSecretsRootCommand : RootCommand
                                        TIP: You can configure default arguments to this command by using the file ~/.config/dotnet-manage-secrets.rsp. 
                                        """;
 
+    private readonly ReadonlyFlag _readonly = new();
     private readonly ProjectOption _project = new();
     private readonly EditorOption _editor = new();
     private readonly FormatOption _format = new();
@@ -32,6 +33,7 @@ internal class ManageSecretsRootCommand : RootCommand
 
     public ManageSecretsRootCommand() : base(ConstDescription)
     {
+        Options.Add(_readonly);
         Options.Add(_project);
         Options.Add(_editor);
         Options.Add(_format);
@@ -105,6 +107,13 @@ internal class ManageSecretsRootCommand : RootCommand
 
         string dirtyJson = File.ReadAllText(secretsFilePath);
         string cleanJson = filter.Clean(dirtyJson);
+
+        if (parseResult.GetValue(_readonly))
+        {
+            Console.WriteLine(cleanJson);
+            return 0;
+        }
+
         string fileFormat = format switch
         {
             DataFormats.Json or DataFormats.FlatJson => "json",
