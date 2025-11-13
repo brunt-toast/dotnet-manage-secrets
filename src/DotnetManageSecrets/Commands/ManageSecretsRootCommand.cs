@@ -37,7 +37,11 @@ internal class ManageSecretsRootCommand : RootCommand
         Options.Add(_project);
         Options.Add(_editor);
         Options.Add(_format);
+
         Arguments.Add(_leftovers);
+        
+        Subcommands.Add(new OpenCliCommand());
+        
         SetAction(ExecuteAction);
     }
 
