@@ -66,10 +66,10 @@ internal class ManageSecretsRootCommand : RootCommand
             return ExitCodes.EditorNotFound;
         }
 
-        int gotProject = ProjectLocator.TryGetCsprojPath(parseResult, _project, out string? csprojPath);
-        if (gotProject != 0)
+        int didFindProject = ProjectLocator.TryGetCsprojPath(parseResult, _project, out string? csprojPath);
+        if (didFindProject != 0)
         {
-            return gotProject;
+            return didFindProject;
         }
 
         if (csprojPath is null)
@@ -105,12 +105,12 @@ internal class ManageSecretsRootCommand : RootCommand
             _ => throw new ArgumentOutOfRangeException()
         };
 
-        string dirtyJson = File.ReadAllText(secretsFilePath);
-        string cleanJson = filter.Clean(dirtyJson);
+        string jsonFromSecretsFile = File.ReadAllText(secretsFilePath);
+        string contentForEdit = filter.Clean(jsonFromSecretsFile);
 
         if (parseResult.GetValue(_readonly))
         {
-            Console.WriteLine(cleanJson);
+            Console.WriteLine(contentForEdit);
             return 0;
         }
 
@@ -122,16 +122,16 @@ internal class ManageSecretsRootCommand : RootCommand
             DataFormats.Toml => "toml",
             _ => throw new ArgumentOutOfRangeException()
         };
-        string targetFileName = Path.Join(Path.GetTempPath(), $"{Guid.NewGuid()}.{fileFormat}");
-        FileExtensions.CreateWithoutLease(targetFileName);
-        File.WriteAllText(targetFileName, cleanJson);
+        string editingFileName = Path.Join(Path.GetTempPath(), $"{Guid.NewGuid()}.{fileFormat}");
+        FileExtensions.CreateWithoutLease(editingFileName);
+        File.WriteAllText(editingFileName, contentForEdit);
 
         ProcessStartInfo psi = new()
         {
             FileName = editor,
         };
 
-        psi.ArgumentList.Add(targetFileName);
+        psi.ArgumentList.Add(editingFileName);
         foreach (var arg in parseResult.GetValue(_leftovers) ?? [])
         {
             psi.ArgumentList.Add(arg);
@@ -146,9 +146,9 @@ internal class ManageSecretsRootCommand : RootCommand
 
         proc.WaitForExit();
 
-        var outJson = File.ReadAllText(targetFileName);
-        File.Delete(targetFileName);
-        string jsonToDump = filter.Smudge(outJson);
+        var contentFromEditor = File.ReadAllText(editingFileName);
+        File.Delete(editingFileName);
+        string jsonToDump = filter.Smudge(contentFromEditor);
         File.WriteAllText(secretsFilePath, jsonToDump);
 
         return ExitCodes.Success;
