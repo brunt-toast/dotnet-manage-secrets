@@ -20,6 +20,13 @@ Install as a .NET tool:
 dotnet tool install -g DotnetManageSecrets
 ```
 
+Alternatively, [download the latest binaries from CI](https://github.com/brunt-toast/dotnet-manage-secrets/actions/) (for Linux x64, Windows x64/x86).
+
+Or build, pack, and install from source: 
+```sh
+dotnet tool uninstall -g DotnetManageSecrets; dotnet tool restore && dotnet cake && dotnet tool install -g --add-source ./src/DotnetManageSecrets/bin/nupkg DotnetManageSecrets
+```
+
 ## About
 
 [User Secrets](https://learn.microsoft.com/en-us/aspnet/core/security/app-secrets) are a great tool to manage sensitive configuration options while minimising the risk of accidentally committing them to version control, but the `dotnet user-secrets` command can be unintuitive and slow to use. 
