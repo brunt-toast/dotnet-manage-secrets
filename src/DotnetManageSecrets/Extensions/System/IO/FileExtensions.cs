@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Dev.JoshBrunton.DotnetManageSecrets.Extensions.System.IO;
 
-namespace Dev.JoshBrunton.DotnetManageSecrets.Extensions.System.IO;
 internal static class FileExtensions
 {
-    public static void CreateWithoutLease(string path)
+    extension(File)
     {
-        using var _ = File.Create(path);
+        public static void Create(string path, string initialContent)
+        {
+            using FileStream stream = File.Create(path);
+            using StreamWriter writer = new StreamWriter(stream);
+            stream.Write(initialContent.Select(x => (byte)x).ToArray());
+        }
     }
 }
