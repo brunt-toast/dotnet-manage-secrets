@@ -7,6 +7,7 @@ using Dev.JoshBrunton.DotnetManageSecrets.Consts;
 using Dev.JoshBrunton.DotnetManageSecrets.Enums;
 using Dev.JoshBrunton.DotnetManageSecrets.Extensions.System;
 using Dev.JoshBrunton.DotnetManageSecrets.Extensions.System.IO;
+using Dev.JoshBrunton.DotnetManageSecrets.Flags.ManageSecretsRootCommand;
 using Dev.JoshBrunton.DotnetManageSecrets.Options.ManageSecretsRootCommandOptions;
 using Dev.JoshBrunton.DotnetManageSecrets.Services;
 using Dev.JoshBrunton.DotnetManageSecrets.Services.Filters;
@@ -25,6 +26,7 @@ internal class ManageSecretsRootCommand : RootCommand
                                        TIP: You can configure default arguments to this command by using the file ~/.config/dotnet-manage-secrets.rsp. 
                                        """;
 
+    private readonly EscapeWslFlag _escapeWsl = new();
     private readonly ReadonlyFlag _readonly = new();
     private readonly ProjectOption _project = new();
     private readonly EditorOption _editor = new();
@@ -33,15 +35,16 @@ internal class ManageSecretsRootCommand : RootCommand
 
     public ManageSecretsRootCommand() : base(ConstDescription)
     {
+        Options.Add(_escapeWsl);
         Options.Add(_readonly);
         Options.Add(_project);
         Options.Add(_editor);
         Options.Add(_format);
 
         Arguments.Add(_leftovers);
-        
+
         Subcommands.Add(new OpenCliCommand());
-        
+
         SetAction(ExecuteAction);
     }
 
@@ -88,9 +91,40 @@ internal class ManageSecretsRootCommand : RootCommand
             return ExitCodes.ProjectNotRegisteredForUserSecrets;
         }
 
-        string secretsFolderPath = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-            ? Environment.ExpandEnvironmentVariables(@$"%APPDATA%\Microsoft\UserSecrets\{guid}")
-            : Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), $".microsoft/usersecrets/{guid}");
+        string secretsFolderPath;
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            secretsFolderPath = Environment.ExpandEnvironmentVariables(@$"%APPDATA%\Microsoft\UserSecrets\{guid}");
+        }
+        else if (parseResult.GetValue(_escapeWsl))
+        {
+            ProcessStartInfo cmdPsi = new ProcessStartInfo("cmd.exe")
+            {
+                ArgumentList = { "/C", "echo", @$"%APPDATA%\Microsoft\UserSecrets\{guid}" },
+                RedirectStandardOutput = true
+            };
+            using var cmdProcess = new Process();
+            cmdProcess.StartInfo = cmdPsi;
+            cmdProcess.Start();
+            cmdProcess.WaitForExit();
+            string cmdPath = cmdProcess.StandardOutput.ReadToEnd();
+
+            ProcessStartInfo wslPathPsi = new ProcessStartInfo("wslpath")
+            {
+                ArgumentList = { "-u", cmdPath },
+                RedirectStandardOutput = true
+            };
+            using var wslPathProcess = new Process();
+            wslPathProcess.StartInfo = wslPathPsi;
+            wslPathProcess.Start();
+            wslPathProcess.WaitForExit();
+            secretsFolderPath = wslPathProcess.StandardOutput.ReadToEnd();
+        }
+        else
+        {
+            secretsFolderPath = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                $".microsoft/usersecrets/{guid}");
+        }
 
         string secretsFilePath = Path.Join(secretsFolderPath, "secrets.json");
 
