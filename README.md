@@ -24,7 +24,7 @@ Alternatively, [download the latest binaries from CI](https://github.com/brunt-t
 
 Or build, pack, and install from source: 
 ```sh
-dotnet tool uninstall -g DotnetManageSecrets; dotnet tool restore && dotnet cake && dotnet tool install -g --add-source ./src/DotnetManageSecrets/bin/nupkg DotnetManageSecrets
+dotnet tool uninstall -g DotnetManageSecrets; rm -r ./src/DotnetManageSecrets/bin/nupkg; dotnet tool restore && dotnet cake && dotnet tool install -g --add-source ./src/DotnetManageSecrets/bin/nupkg DotnetManageSecrets
 ```
 
 ## About
