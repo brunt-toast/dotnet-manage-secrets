@@ -131,8 +131,7 @@ internal class ManageSecretsRootCommand : RootCommand
         if (!File.Exists(secretsFilePath))
         {
             Directory.CreateDirectory(secretsFolderPath);
-            FileExtensions.CreateWithoutLease(secretsFilePath);
-            File.WriteAllText(secretsFilePath, "{}");
+            File.Create(secretsFilePath, "{}");
         }
 
         DataFormats format = parseResult.GetValue(_format);
@@ -164,8 +163,7 @@ internal class ManageSecretsRootCommand : RootCommand
             _ => throw new ArgumentOutOfRangeException()
         };
         string editingFileName = Path.Join(Path.GetTempPath(), $"{Guid.NewGuid()}.{fileFormat}");
-        FileExtensions.CreateWithoutLease(editingFileName);
-        File.WriteAllText(editingFileName, contentForEdit);
+        FileExtensions.Create(editingFileName, contentForEdit);
 
         ProcessStartInfo psi = new()
         {
