@@ -88,12 +88,15 @@ internal class ManageSecretsRootCommand : RootCommand
             return ExitCodes.ProjectNotRegisteredForUserSecrets;
         }
 
-        string secretsFilePath = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-            ? Environment.ExpandEnvironmentVariables(@$"%APPDATA%\Microsoft\UserSecrets\{guid}\secrets.json")
-            : Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), $".microsoft/usersecrets/{guid}/secrets.json");
+        string secretsFolderPath = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+            ? Environment.ExpandEnvironmentVariables(@$"%APPDATA%\Microsoft\UserSecrets\{guid}")
+            : Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), $".microsoft/usersecrets/{guid}");
+
+        string secretsFilePath = Path.Join(secretsFolderPath, "secrets.json");
 
         if (!File.Exists(secretsFilePath))
         {
+            Directory.CreateDirectory(secretsFolderPath);
             FileExtensions.CreateWithoutLease(secretsFilePath);
             File.WriteAllText(secretsFilePath, "{}");
         }
