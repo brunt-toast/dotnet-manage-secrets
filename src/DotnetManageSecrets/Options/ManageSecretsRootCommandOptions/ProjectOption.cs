@@ -10,8 +10,11 @@ internal class ProjectOption : Option<string>
     {
         Validators.Add(PathExistsValidator);
         DefaultValueFactory = ValueFactory;
-        Description = "A .csproj file, or a directory containing at least one .csproj file in its tree. " +
-                      "In the case of multiple csproj files, a selection prompt wil appear. ";
+        Description = """
+                      A csproj file containing a single string matching "<UserSecretsId>{guid}</UserSecretsId>,
+                      or a directory whose tree contains at least one such file. In the case of a directory 
+                      containing multiple such files, a selection prompt will appear. 
+                      """;
     }
 
     private void PathExistsValidator(OptionResult opt)

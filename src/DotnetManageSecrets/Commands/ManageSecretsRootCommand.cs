@@ -11,6 +11,7 @@ using Dev.JoshBrunton.DotnetManageSecrets.Flags.ManageSecretsRootCommand;
 using Dev.JoshBrunton.DotnetManageSecrets.Options.ManageSecretsRootCommandOptions;
 using Dev.JoshBrunton.DotnetManageSecrets.Services;
 using Dev.JoshBrunton.DotnetManageSecrets.Services.Filters;
+using Newtonsoft.Json;
 
 namespace Dev.JoshBrunton.DotnetManageSecrets.Commands;
 
@@ -26,6 +27,7 @@ internal class ManageSecretsRootCommand : RootCommand
                                        TIP: You can configure default arguments to this command by using the file ~/.config/dotnet-manage-secrets.rsp. 
                                        """;
 
+    private readonly HideValuesFlag _hideValues = new();
     private readonly EscapeWslFlag _escapeWsl = new();
     private readonly ReadonlyFlag _readonly = new();
     private readonly ProjectOption _project = new();
@@ -35,6 +37,7 @@ internal class ManageSecretsRootCommand : RootCommand
 
     public ManageSecretsRootCommand() : base(ConstDescription)
     {
+        Options.Add(_hideValues);
         Options.Add(_escapeWsl);
         Options.Add(_readonly);
         Options.Add(_project);
@@ -135,17 +138,15 @@ internal class ManageSecretsRootCommand : RootCommand
         }
 
         DataFormats format = parseResult.GetValue(_format);
-        IFilter filter = format switch
-        {
-            DataFormats.Json => new JsonFilter(),
-            DataFormats.FlatJson => new NoopFilter(),
-            DataFormats.Yaml => new YamlFilter(),
-            DataFormats.Xml => new XmlFilter(),
-            DataFormats.Toml => new TomlFilter(),
-            _ => throw new ArgumentOutOfRangeException()
-        };
+        IFilter filter = FilterFactory.GetFilterForDataFormat(format);
 
         string jsonFromSecretsFile = File.ReadAllText(secretsFilePath);
+
+        if (parseResult.GetValue(_hideValues))
+        {
+            jsonFromSecretsFile = ValueObfuscator.Obfuscate(jsonFromSecretsFile);
+        }
+
         string contentForEdit = filter.Clean(jsonFromSecretsFile);
 
         if (parseResult.GetValue(_readonly))
@@ -154,14 +155,7 @@ internal class ManageSecretsRootCommand : RootCommand
             return 0;
         }
 
-        string fileFormat = format switch
-        {
-            DataFormats.Json or DataFormats.FlatJson => "json",
-            DataFormats.Yaml => "yml",
-            DataFormats.Xml => "xml",
-            DataFormats.Toml => "toml",
-            _ => throw new ArgumentOutOfRangeException()
-        };
+        string fileFormat = FilterFactory.GetFileExtensionForDataFormat(format);
         string editingFileName = Path.Join(Path.GetTempPath(), $"{Guid.NewGuid()}.{fileFormat}");
         FileExtensions.Create(editingFileName, contentForEdit);
 
@@ -188,6 +182,14 @@ internal class ManageSecretsRootCommand : RootCommand
         var contentFromEditor = File.ReadAllText(editingFileName);
         File.Delete(editingFileName);
         string jsonToDump = filter.Smudge(contentFromEditor);
+
+        var inDict = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonFromSecretsFile) ?? [];
+        var outDict = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonToDump) ?? [];
+        if (inDict.Count == outDict.Count && inDict.SequenceEqual(outDict))
+        {
+            return ExitCodes.LogicalValueHasNotChanged;
+        }
+
         File.WriteAllText(secretsFilePath, jsonToDump);
 
         return ExitCodes.Success;

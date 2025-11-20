@@ -11,4 +11,5 @@ internal static class ExitCodes
     public const int FailedToStartEditor = 6;
     public const int SecretsFileNotFound = 7;
     public const int InvalidArgument = 8;
+    public const int LogicalValueHasNotChanged = 9;
 }
