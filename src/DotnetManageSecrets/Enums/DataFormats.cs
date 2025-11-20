@@ -1,6 +1,6 @@
 ﻿namespace Dev.JoshBrunton.DotnetManageSecrets.Enums;
 
-internal enum DataFormats
+public enum DataFormats
 {
     Json,
     FlatJson,

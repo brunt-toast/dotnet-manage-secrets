@@ -138,16 +138,7 @@ internal class ManageSecretsRootCommand : RootCommand
         }
 
         DataFormats format = parseResult.GetValue(_format);
-        IFilter filter = format switch
-        {
-            DataFormats.Json => new JsonFilter(),
-            DataFormats.FlatJson => new NoopFilter(),
-            DataFormats.Yaml => new YamlFilter(),
-            DataFormats.Xml => new XmlFilter(),
-            DataFormats.Toml => new TomlFilter(),
-            DataFormats.Ini => new IniFilter(),
-            _ => throw new ArgumentOutOfRangeException()
-        };
+        IFilter filter = FilterFactory.GetFilterForDataFormat(format);
 
         string jsonFromSecretsFile = File.ReadAllText(secretsFilePath);
 
@@ -164,15 +155,7 @@ internal class ManageSecretsRootCommand : RootCommand
             return 0;
         }
 
-        string fileFormat = format switch
-        {
-            DataFormats.Json or DataFormats.FlatJson => "json",
-            DataFormats.Yaml => "yml",
-            DataFormats.Xml => "xml",
-            DataFormats.Toml => "toml",
-            DataFormats.Ini => "ini",
-            _ => throw new ArgumentOutOfRangeException()
-        };
+        string fileFormat = FilterFactory.GetFileExtensionForDataFormat(format);
         string editingFileName = Path.Join(Path.GetTempPath(), $"{Guid.NewGuid()}.{fileFormat}");
         FileExtensions.Create(editingFileName, contentForEdit);
 
