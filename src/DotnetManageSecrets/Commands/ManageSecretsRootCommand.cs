@@ -197,6 +197,14 @@ internal class ManageSecretsRootCommand : RootCommand
         var contentFromEditor = File.ReadAllText(editingFileName);
         File.Delete(editingFileName);
         string jsonToDump = filter.Smudge(contentFromEditor);
+
+        var inDict = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonFromSecretsFile) ?? [];
+        var outDict = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonToDump) ?? [];
+        if (inDict.OrderBy(kvp => kvp.Key).SequenceEqual(outDict.OrderBy(kvp => kvp.Key)))
+        {
+            return ExitCodes.LogicalValueHasNotChanged;
+        }
+
         File.WriteAllText(secretsFilePath, jsonToDump);
 
         return ExitCodes.Success;
