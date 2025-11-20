@@ -145,6 +145,7 @@ internal class ManageSecretsRootCommand : RootCommand
             DataFormats.Yaml => new YamlFilter(),
             DataFormats.Xml => new XmlFilter(),
             DataFormats.Toml => new TomlFilter(),
+            DataFormats.Ini => new IniFilter(),
             _ => throw new ArgumentOutOfRangeException()
         };
 
@@ -169,6 +170,7 @@ internal class ManageSecretsRootCommand : RootCommand
             DataFormats.Yaml => "yml",
             DataFormats.Xml => "xml",
             DataFormats.Toml => "toml",
+            DataFormats.Ini => "ini",
             _ => throw new ArgumentOutOfRangeException()
         };
         string editingFileName = Path.Join(Path.GetTempPath(), $"{Guid.NewGuid()}.{fileFormat}");

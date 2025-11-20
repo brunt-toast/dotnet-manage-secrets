@@ -7,5 +7,6 @@ internal enum DataFormats
     Yaml,
     Yml = Yaml,
     Xml,
-    Toml
+    Toml,
+    Ini
 }
