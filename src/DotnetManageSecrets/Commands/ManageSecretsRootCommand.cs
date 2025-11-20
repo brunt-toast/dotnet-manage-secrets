@@ -185,7 +185,7 @@ internal class ManageSecretsRootCommand : RootCommand
 
         var inDict = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonFromSecretsFile) ?? [];
         var outDict = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonToDump) ?? [];
-        if (inDict.OrderBy(kvp => kvp.Key).SequenceEqual(outDict.OrderBy(kvp => kvp.Key)))
+        if (inDict.SequenceEqual(outDict))
         {
             return ExitCodes.LogicalValueHasNotChanged;
         }
