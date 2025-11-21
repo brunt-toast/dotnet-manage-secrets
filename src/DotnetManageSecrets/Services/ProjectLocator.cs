@@ -41,7 +41,7 @@ internal static class ProjectLocator
         path = null;
 
         string[] projects = Directory.GetFiles(directory, "*.csproj", SearchOption.AllDirectories)
-        .Where(x => UserSecretsIdReader.TryGetSecretsId(x, out _))
+        .Where(x => UserSecretsIdReader.TryGetSecretsId(x).IsOk)
         .ToArray();
 
         if (projects.Length == 0)

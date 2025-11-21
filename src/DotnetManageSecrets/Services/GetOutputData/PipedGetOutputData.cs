@@ -1,4 +1,5 @@
 ﻿using Dev.JoshBrunton.DotnetManageSecrets.Extensions.System;
+using Dev.JoshBrunton.DotnetManageSecrets.Types;
 
 namespace Dev.JoshBrunton.DotnetManageSecrets.Services.GetOutputData;
 
@@ -11,8 +12,8 @@ internal class PipedGetOutputData : IGetOutputData
         Input = input;
     }
 
-    public string GetOutput()
+    public Result<string> GetOutput()
     {
-        return Console.GetPipedInput();
+        return Result<string>.Ok(Console.GetPipedInput());
     }
 }

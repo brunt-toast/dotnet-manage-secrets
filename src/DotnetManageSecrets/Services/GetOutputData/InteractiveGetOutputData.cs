@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using Dev.JoshBrunton.DotnetManageSecrets.Consts;
 using Dev.JoshBrunton.DotnetManageSecrets.Enums;
+using Dev.JoshBrunton.DotnetManageSecrets.Types;
 
 namespace Dev.JoshBrunton.DotnetManageSecrets.Services.GetOutputData;
 
@@ -20,7 +21,7 @@ internal class InteractiveGetOutputData : IGetOutputData
         Input = input;
     }
 
-    public string GetOutput()
+    public Result<string> GetOutput()
     {
         string fileFormat = FilterFactory.GetFileExtensionForDataFormat(_dataFormat);
         string editingFileName = Path.Join(Path.GetTempPath(), $"{Guid.NewGuid()}.{fileFormat}");
@@ -41,8 +42,7 @@ internal class InteractiveGetOutputData : IGetOutputData
         if (proc is null)
         {
             Console.Error.WriteLine("The editor process failed to start.");
-            Environment.ExitCode = ExitCodes.FailedToStartEditor;
-            return Input;
+            return Result<string>.Err(ExitCodes.FailedToStartEditor);
         }
 
         proc.WaitForExit();
@@ -50,6 +50,6 @@ internal class InteractiveGetOutputData : IGetOutputData
         var contentFromEditor = File.ReadAllText(editingFileName);
         File.Delete(editingFileName);
 
-        return contentFromEditor;
+        return Result<string>.Ok(contentFromEditor);
     }
 }

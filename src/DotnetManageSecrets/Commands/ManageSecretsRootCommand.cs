@@ -98,28 +98,12 @@ internal class ManageSecretsRootCommand : RootCommand
             Environment.Exit(0);
         }
 
-        IGetOutputData getOutputData;
-        if (Console.IsInputRedirected)
-        {
-            getOutputData = new PipedGetOutputData(contentForEdit);
-        }
-        else
-        {
-            string? editor = parseResult.GetValue(_editor);
-            if (editor is null)
-            {
-                Console.Error.WriteLine("No editor could be found via the $EDITOR environment variable or --editor|-e flag, and input was not redirected.");
-                Environment.ExitCode = ExitCodes.EditorNotFound;
-                return;
-            }
-            getOutputData = new InteractiveGetOutputData(contentForEdit, editor, parseResult.GetValue(_leftovers) ?? [], format);
-        }
+        IGetOutputData getOutputData = IGetOutputData.GetDefault(contentForEdit, 
+            parseResult.GetValue(_editor),
+            parseResult.GetValue(_leftovers) ?? [], 
+            format).Unwrap();
 
-        string contentFromEditor = getOutputData.GetOutput();
-        if (Environment.ExitCode != 0)
-        {
-            return;
-        }
+        string contentFromEditor = getOutputData.GetOutput().Unwrap();
 
         string jsonToDump = filter.Smudge(contentFromEditor);
 

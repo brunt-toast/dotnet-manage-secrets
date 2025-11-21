@@ -9,6 +9,8 @@ internal class Result<T> : Result
     private T? _value;
     private int? _err;
 
+    public bool IsOk => _value is not null;
+
     private Result()
     {
     }
