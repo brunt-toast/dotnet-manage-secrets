@@ -2,7 +2,6 @@
 using Dev.JoshBrunton.DotnetManageSecrets.Consts;
 using Dev.JoshBrunton.DotnetManageSecrets.Enums;
 using Dev.JoshBrunton.DotnetManageSecrets.Extensions.System;
-using Dev.JoshBrunton.DotnetManageSecrets.Extensions.System.IO;
 using Dev.JoshBrunton.DotnetManageSecrets.Flags.ManageSecretsRootCommand;
 using Dev.JoshBrunton.DotnetManageSecrets.Options.ManageSecretsRootCommandOptions;
 using Dev.JoshBrunton.DotnetManageSecrets.Services;
@@ -136,7 +135,7 @@ internal class ManageSecretsRootCommand : RootCommand
         if (!File.Exists(secretsFilePath))
         {
             Directory.CreateDirectory(secretsFolderPath);
-            File.Create(secretsFilePath, "{}");
+            File.WriteAllText(secretsFilePath, "{}");
         }
 
         DataFormats format = parseResult.GetValue(_format);

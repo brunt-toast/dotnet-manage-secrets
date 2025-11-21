@@ -1,5 +1,4 @@
-﻿using Dev.JoshBrunton.DotnetManageSecrets.Extensions.System.IO;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Dev.JoshBrunton.DotnetManageSecrets.Consts;
 using Dev.JoshBrunton.DotnetManageSecrets.Enums;
 
@@ -25,7 +24,7 @@ internal class InteractiveGetOutputData : IGetOutputData
     {
         string fileFormat = FilterFactory.GetFileExtensionForDataFormat(_dataFormat);
         string editingFileName = Path.Join(Path.GetTempPath(), $"{Guid.NewGuid()}.{fileFormat}");
-        FileExtensions.Create(editingFileName, Input);
+        File.WriteAllText(editingFileName, Input);
 
         ProcessStartInfo psi = new()
         {
