@@ -34,7 +34,7 @@ internal class HelpActionWithExitCodes : SynchronousCommandLineAction
                 GetDescription(value)
             )).ToDictionary();
 
-        int lColWidth = x.Keys.MaxBy(x => x.Length).Length;
+        int lColWidth = x.Keys.MaxBy(y => y.Length)!.Length;
         int rColWidth = Console.BufferWidth - 6 - lColWidth;
 
         foreach (var kvp in x)
