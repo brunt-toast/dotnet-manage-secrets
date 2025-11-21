@@ -1,3 +1,5 @@
+namespace Dev.JoshBrunton.DotnetManageSecrets.Flags.ManageSecretsRootCommand;
+
 internal class ReadonlyFlag : Flag
 {
     public ReadonlyFlag() : base("--readonly", "-r")
