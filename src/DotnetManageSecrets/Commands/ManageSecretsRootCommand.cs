@@ -1,17 +1,21 @@
-﻿using System.Collections.ObjectModel;
-using System.CommandLine;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-using Dev.JoshBrunton.DotnetManageSecrets.Arguments.ManageSecretsRootCommandArguments;
-using Dev.JoshBrunton.DotnetManageSecrets.Consts;
+﻿using Dev.JoshBrunton.DotnetManageSecrets.Arguments.ManageSecretsRootCommandArguments;
 using Dev.JoshBrunton.DotnetManageSecrets.Enums;
 using Dev.JoshBrunton.DotnetManageSecrets.Extensions.System;
-using Dev.JoshBrunton.DotnetManageSecrets.Extensions.System.IO;
+using Dev.JoshBrunton.DotnetManageSecrets.Extensions.System.CommandLine;
 using Dev.JoshBrunton.DotnetManageSecrets.Flags.ManageSecretsRootCommand;
+using Dev.JoshBrunton.DotnetManageSecrets.IO;
 using Dev.JoshBrunton.DotnetManageSecrets.Options.ManageSecretsRootCommandOptions;
 using Dev.JoshBrunton.DotnetManageSecrets.Services;
 using Dev.JoshBrunton.DotnetManageSecrets.Services.Filters;
+using Dev.JoshBrunton.DotnetManageSecrets.Services.GetOutputData;
 using Newtonsoft.Json;
+using System.Collections.ObjectModel;
+using System.CommandLine;
+using System.CommandLine.Help;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+using Dev.JoshBrunton.DotnetManageSecrets.Enums.Enums;
+using Dev.JoshBrunton.DotnetManageSecrets.Help;
 
 namespace Dev.JoshBrunton.DotnetManageSecrets.Commands;
 
@@ -48,10 +52,21 @@ internal class ManageSecretsRootCommand : RootCommand
 
         Subcommands.Add(new OpenCliCommand());
 
+        foreach (var t in Options)
+        {
+            if (t is not HelpOption defaultHelpOption)
+            {
+                continue;
+            }
+
+            defaultHelpOption.Action = new HelpActionWithExitCodes((HelpAction)defaultHelpOption.Action!);
+            break;
+        }
+
         SetAction(ExecuteAction);
     }
 
-    public int Execute(string[] args)
+    public void Execute(string[] args)
     {
         string defaultRspPath = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config", "dotnet-manage-secrets.rsp");
         if (File.Exists(defaultRspPath))
@@ -59,82 +74,23 @@ internal class ManageSecretsRootCommand : RootCommand
             args = [.. args, $"@{defaultRspPath}"];
         }
 
-        return Parse(args).Invoke();
+        Parse(args).Invoke();
     }
 
-    private int ExecuteAction(ParseResult parseResult)
+    private void ExecuteAction(ParseResult parseResult)
     {
-        if (parseResult.Errors.Any())
-        {
-            Console.Error.WriteLine(string.Join(Environment.NewLine, parseResult.Errors.Select(x => x.Message)));
-            return ExitCodes.ParseFailure;
-        }
+        using var _ = ConsoleDiversion.ForParseResult(parseResult);
+        parseResult.TerminateIfParseErrors();
 
-        if (parseResult.GetValue(_editor) is not { } editor || string.IsNullOrWhiteSpace(editor))
-        {
-            Console.Error.WriteLine($"The editor was not found. Please set environment variable $EDITOR or pass {_editor.Name}");
-            return ExitCodes.EditorNotFound;
-        }
-
-        int didFindProject = ProjectLocator.TryGetCsprojPath(parseResult, _project, out string? csprojPath);
-        if (didFindProject != 0)
-        {
-            return didFindProject;
-        }
-
-        if (csprojPath is null)
-        {
-            Console.Error.WriteLine($"The task {nameof(ProjectLocator.TryGetCsprojPath)} suggested it succeeded, but its output was null.");
-            return ExitCodes.UnknownError;
-        }
-
-        if (!UserSecretsIdReader.TryGetSecretsId(csprojPath, out string? guid))
-        {
-            Console.Error.WriteLine("Couldn't get a single secrets ID from the chosen project. Expected exactly one <UserSecretsId> node containing a GUID.");
-            return ExitCodes.ProjectNotRegisteredForUserSecrets;
-        }
-
-        string secretsFolderPath;
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            secretsFolderPath = Environment.ExpandEnvironmentVariables(@$"%APPDATA%\Microsoft\UserSecrets\{guid}");
-        }
-        else if (parseResult.GetValue(_escapeWsl))
-        {
-            ProcessStartInfo cmdPsi = new ProcessStartInfo("cmd.exe")
-            {
-                ArgumentList = { "/C", "echo", @$"%APPDATA%\Microsoft\UserSecrets\{guid}" },
-                RedirectStandardOutput = true
-            };
-            using var cmdProcess = new Process();
-            cmdProcess.StartInfo = cmdPsi;
-            cmdProcess.Start();
-            cmdProcess.WaitForExit();
-            string cmdPath = cmdProcess.StandardOutput.ReadToEnd();
-
-            ProcessStartInfo wslPathPsi = new ProcessStartInfo("wslpath")
-            {
-                ArgumentList = { "-u", cmdPath },
-                RedirectStandardOutput = true
-            };
-            using var wslPathProcess = new Process();
-            wslPathProcess.StartInfo = wslPathPsi;
-            wslPathProcess.Start();
-            wslPathProcess.WaitForExit();
-            secretsFolderPath = wslPathProcess.StandardOutput.ReadToEnd();
-        }
-        else
-        {
-            secretsFolderPath = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
-                $".microsoft/usersecrets/{guid}");
-        }
-
+        string csProjPath = ProjectLocator.TryGetCsprojPath(parseResult, _project).Unwrap();
+        string guid = UserSecretsIdReader.TryGetSecretsId(csProjPath).Unwrap();
+        string secretsFolderPath = SecretsFolderLocator.GetFolderForId(guid, parseResult.GetValue(_escapeWsl));
         string secretsFilePath = Path.Join(secretsFolderPath, "secrets.json");
 
         if (!File.Exists(secretsFilePath))
         {
             Directory.CreateDirectory(secretsFolderPath);
-            File.Create(secretsFilePath, "{}");
+            File.WriteAllText(secretsFilePath, "{}");
         }
 
         DataFormats format = parseResult.GetValue(_format);
@@ -152,46 +108,26 @@ internal class ManageSecretsRootCommand : RootCommand
         if (parseResult.GetValue(_readonly))
         {
             Console.WriteLine(contentForEdit);
-            return 0;
+            Environment.Exit(0);
         }
 
-        string fileFormat = FilterFactory.GetFileExtensionForDataFormat(format);
-        string editingFileName = Path.Join(Path.GetTempPath(), $"{Guid.NewGuid()}.{fileFormat}");
-        FileExtensions.Create(editingFileName, contentForEdit);
+        IGetOutputData getOutputData = IGetOutputData.GetDefault(contentForEdit,
+            parseResult.GetValue(_editor),
+            parseResult.GetValue(_leftovers) ?? [],
+            format).Unwrap();
 
-        ProcessStartInfo psi = new()
-        {
-            FileName = editor,
-        };
+        string contentFromEditor = getOutputData.GetOutput().Unwrap();
 
-        psi.ArgumentList.Add(editingFileName);
-        foreach (var arg in parseResult.GetValue(_leftovers) ?? [])
-        {
-            psi.ArgumentList.Add(arg);
-        }
-
-        using Process? proc = Process.Start(psi);
-        if (proc is null)
-        {
-            Console.Error.WriteLine("The editor process failed to start.");
-            return ExitCodes.FailedToStartEditor;
-        }
-
-        proc.WaitForExit();
-
-        var contentFromEditor = File.ReadAllText(editingFileName);
-        File.Delete(editingFileName);
         string jsonToDump = filter.Smudge(contentFromEditor);
 
         var inDict = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonFromSecretsFile) ?? [];
         var outDict = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonToDump) ?? [];
         if (inDict.Count == outDict.Count && inDict.SequenceEqual(outDict))
         {
-            return ExitCodes.LogicalValueHasNotChanged;
+            Environment.ExitCode = (int)ExitCodes.LogicalValueHasNotChanged;
+            return;
         }
 
         File.WriteAllText(secretsFilePath, jsonToDump);
-
-        return ExitCodes.Success;
     }
 }

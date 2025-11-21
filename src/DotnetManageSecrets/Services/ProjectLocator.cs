@@ -1,52 +1,47 @@
-﻿using Dev.JoshBrunton.DotnetManageSecrets.Consts;
-using System;
-using System.Collections.Generic;
-using System.CommandLine;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.CommandLine;
+using System.Diagnostics.CodeAnalysis;
+using Dev.JoshBrunton.DotnetManageSecrets.Enums.Enums;
+using Dev.JoshBrunton.DotnetManageSecrets.Types;
 
 namespace Dev.JoshBrunton.DotnetManageSecrets.Services;
+
 internal static class ProjectLocator
 {
-    public static int TryGetCsprojPath(ParseResult parseResult, Option<string> projectOption, out string? csprojPath)
+    public static Result<string> TryGetCsprojPath(ParseResult parseResult, Option<string> projectOption)
     {
-        csprojPath = null;
-
         if (parseResult.GetValue(projectOption) is not { } projectPath)
         {
             Console.Error.WriteLine("The project path could not be found.");
-            return ExitCodes.UnknownError;
+            return Result<string>.Err(ExitCodes.UnknownError);
         }
 
         if (File.Exists(projectPath))
         {
-            csprojPath = projectPath;
-            return ExitCodes.Success;
+            return Result<string>.Ok(projectPath);
         }
 
         if (Directory.Exists(projectPath))
         {
-            if (TryGetCsprojFromDirectory(projectPath, out csprojPath))
+            if (TryGetCsprojFromDirectory(projectPath, out string? csprojPath))
             {
-                return ExitCodes.Success;
+                return Result<string>.Ok(csprojPath);
             }
 
             Console.Error.WriteLine($"Couldn't find any .csproj files with user secrets enabled under directory {projectPath}");
-            return ExitCodes.NoMatchingFiles;
+            return Result<string>.Err(ExitCodes.NoMatchingFiles);
 
         }
 
         Console.Error.WriteLine($"\"{projectOption.Name}\" is not a file or directory.");
-        return ExitCodes.DirectoryNotFound;
+        return Result<string>.Err(ExitCodes.DirectoryNotFound);
     }
 
-    private static bool TryGetCsprojFromDirectory(string directory, out string? path)
+    private static bool TryGetCsprojFromDirectory(string directory, [NotNullWhen(true)] out string? path)
     {
         path = null;
 
         string[] projects = Directory.GetFiles(directory, "*.csproj", SearchOption.AllDirectories)
-        .Where(x => UserSecretsIdReader.TryGetSecretsId(x, out _))
+        .Where(x => UserSecretsIdReader.TryGetSecretsId(x).IsOk)
         .ToArray();
 
         if (projects.Length == 0)

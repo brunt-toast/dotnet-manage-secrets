@@ -11,9 +11,7 @@ internal class ProjectOption : Option<string>
         Validators.Add(PathExistsValidator);
         DefaultValueFactory = ValueFactory;
         Description = """
-                      A csproj file containing a single string matching "<UserSecretsId>{guid}</UserSecretsId>,
-                      or a directory whose tree contains at least one such file. In the case of a directory 
-                      containing multiple such files, a selection prompt will appear. 
+                      A csproj file containing a single string matching "<UserSecretsId>{guid}</UserSecretsId>, or a directory whose tree contains at least one such file. In the case of a directory containing multiple such files, a selection prompt will appear. 
                       """;
     }
 

@@ -11,11 +11,13 @@ internal class EscapeWslFlag : Flag
 
         Validators.Add(ValidateLinuxOsPlatform);
         Validators.Add(ValidateWslPathCommand);
+
+        Hidden = !(IsLinux() && CanResolveWslPathBin());
     }
 
-    private void ValidateWslPathCommand(OptionResult opt)
+    private static void ValidateWslPathCommand(OptionResult opt)
     {
-        if (!File.Exists("/usr/bin/wslpath"))
+        if (!CanResolveWslPathBin())
         {
             opt.AddError("Couldn't find /usr/bin/wslpath. Are we really running in WSL?");
         }
@@ -23,9 +25,12 @@ internal class EscapeWslFlag : Flag
 
     private void ValidateLinuxOsPlatform(OptionResult opt)
     {
-        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        if (!IsLinux())
         {
             opt.AddError($"{Name} can only be used in Linux environments.");
         }
     }
+
+    private static bool IsLinux() => RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+    private static bool CanResolveWslPathBin() => File.Exists("/usr/bin/wslpath");
 }
