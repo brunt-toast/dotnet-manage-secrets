@@ -69,62 +69,9 @@ internal class ManageSecretsRootCommand : RootCommand
         using var _ = ConsoleDiversion.ForParseResult(parseResult);
         parseResult.TerminateIfParseErrors();
 
-        int didFindProject = ProjectLocator.TryGetCsprojPath(parseResult, _project, out string? csprojPath);
-        if (didFindProject != 0)
-        {
-            Environment.ExitCode = didFindProject;
-            return;
-        }
-
-        if (csprojPath is null)
-        {
-            Console.Error.WriteLine($"The task {nameof(ProjectLocator.TryGetCsprojPath)} suggested it succeeded, but its output was null.");
-            Environment.ExitCode = ExitCodes.UnknownError;
-            return;
-        }
-
-        if (!UserSecretsIdReader.TryGetSecretsId(csprojPath, out string? guid))
-        {
-            Console.Error.WriteLine("Couldn't get a single secrets ID from the chosen project. Expected exactly one <UserSecretsId> node containing a GUID.");
-            Environment.ExitCode = ExitCodes.ProjectNotRegisteredForUserSecrets;
-            return;
-        }
-
-        string secretsFolderPath;
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            secretsFolderPath = Environment.ExpandEnvironmentVariables(@$"%APPDATA%\Microsoft\UserSecrets\{guid}");
-        }
-        else if (parseResult.GetValue(_escapeWsl))
-        {
-            ProcessStartInfo cmdPsi = new ProcessStartInfo("cmd.exe")
-            {
-                ArgumentList = { "/C", "echo", @$"%APPDATA%\Microsoft\UserSecrets\{guid}" },
-                RedirectStandardOutput = true
-            };
-            using var cmdProcess = new Process();
-            cmdProcess.StartInfo = cmdPsi;
-            cmdProcess.Start();
-            cmdProcess.WaitForExit();
-            string cmdPath = cmdProcess.StandardOutput.ReadToEnd();
-
-            ProcessStartInfo wslPathPsi = new ProcessStartInfo("wslpath")
-            {
-                ArgumentList = { "-u", cmdPath },
-                RedirectStandardOutput = true
-            };
-            using var wslPathProcess = new Process();
-            wslPathProcess.StartInfo = wslPathPsi;
-            wslPathProcess.Start();
-            wslPathProcess.WaitForExit();
-            secretsFolderPath = wslPathProcess.StandardOutput.ReadToEnd();
-        }
-        else
-        {
-            secretsFolderPath = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
-                $".microsoft/usersecrets/{guid}");
-        }
-
+        string csProjPath = ProjectLocator.TryGetCsprojPath(parseResult, _project).Unwrap();
+        string guid = UserSecretsIdReader.TryGetSecretsId(csProjPath).Unwrap();
+        string secretsFolderPath = SecretsFolderLocator.GetFolderForId(guid, parseResult.GetValue(_escapeWsl));
         string secretsFilePath = Path.Join(secretsFolderPath, "secrets.json");
 
         if (!File.Exists(secretsFilePath))
