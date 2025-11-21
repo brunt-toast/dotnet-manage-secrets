@@ -12,6 +12,8 @@ internal class EditorOption : Option<string>
         DefaultValueFactory = ValueFactory;
         Description = """
                       The command to invoke the editor. This can be a relative path, fully qualified path, or executable in $PATH. Shell aliases are not supported. The default value is the $EDITOR environment variable.
+                      
+                      If input has been redirected, e.g. by piping the output of another command into this one, this option is not checked and can be omitted. The value from the input stream will be run through the conversion logic and output to the user-secrets file.
                       """;
     }
 
