@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.CommandLine;
-using System.Text;
-using Dev.JoshBrunton.DotnetManageSecrets.Arguments.OpenCliCommandArguments;
+﻿using Dev.JoshBrunton.DotnetManageSecrets.Arguments.OpenCliCommandArguments;
 using Dev.JoshBrunton.DotnetManageSecrets.Consts;
+using Dev.JoshBrunton.DotnetManageSecrets.IO;
 using Dev.JoshBrunton.DotnetManageSecrets.OpenCli;
+using System.CommandLine;
 
 namespace Dev.JoshBrunton.DotnetManageSecrets.Commands;
 
@@ -21,6 +19,8 @@ internal class OpenCliCommand : Command
 
     private int ExecuteAction(ParseResult parseResult)
     {
+        using var _ = ConsoleDiversion.ForParseResult(parseResult);
+
         string? commandName = parseResult.GetValue(_commandNameArg);
         if (commandName is null)
         {

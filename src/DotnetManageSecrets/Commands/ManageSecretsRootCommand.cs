@@ -13,6 +13,7 @@ using System.Collections.ObjectModel;
 using System.CommandLine;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using Dev.JoshBrunton.DotnetManageSecrets.IO;
 
 namespace Dev.JoshBrunton.DotnetManageSecrets.Commands;
 
@@ -65,6 +66,8 @@ internal class ManageSecretsRootCommand : RootCommand
 
     private void ExecuteAction(ParseResult parseResult)
     {
+        using var _ = ConsoleDiversion.ForParseResult(parseResult);
+
         if (parseResult.Errors.Any())
         {
             Console.Error.WriteLine(string.Join(Environment.NewLine, parseResult.Errors.Select(x => x.Message)));
