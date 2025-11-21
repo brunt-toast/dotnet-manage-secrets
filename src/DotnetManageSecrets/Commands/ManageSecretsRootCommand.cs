@@ -1,8 +1,9 @@
 ﻿using Dev.JoshBrunton.DotnetManageSecrets.Arguments.ManageSecretsRootCommandArguments;
-using Dev.JoshBrunton.DotnetManageSecrets.Consts;
 using Dev.JoshBrunton.DotnetManageSecrets.Enums;
 using Dev.JoshBrunton.DotnetManageSecrets.Extensions.System;
+using Dev.JoshBrunton.DotnetManageSecrets.Extensions.System.CommandLine;
 using Dev.JoshBrunton.DotnetManageSecrets.Flags.ManageSecretsRootCommand;
+using Dev.JoshBrunton.DotnetManageSecrets.IO;
 using Dev.JoshBrunton.DotnetManageSecrets.Options.ManageSecretsRootCommandOptions;
 using Dev.JoshBrunton.DotnetManageSecrets.Services;
 using Dev.JoshBrunton.DotnetManageSecrets.Services.Filters;
@@ -10,10 +11,11 @@ using Dev.JoshBrunton.DotnetManageSecrets.Services.GetOutputData;
 using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 using System.CommandLine;
+using System.CommandLine.Help;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using Dev.JoshBrunton.DotnetManageSecrets.Extensions.System.CommandLine;
-using Dev.JoshBrunton.DotnetManageSecrets.IO;
+using Dev.JoshBrunton.DotnetManageSecrets.Enums.Enums;
+using Dev.JoshBrunton.DotnetManageSecrets.Help;
 
 namespace Dev.JoshBrunton.DotnetManageSecrets.Commands;
 
@@ -49,6 +51,17 @@ internal class ManageSecretsRootCommand : RootCommand
         Arguments.Add(_leftovers);
 
         Subcommands.Add(new OpenCliCommand());
+
+        foreach (var t in Options)
+        {
+            if (t is not HelpOption defaultHelpOption)
+            {
+                continue;
+            }
+
+            defaultHelpOption.Action = new HelpActionWithExitCodes((HelpAction)defaultHelpOption.Action!);
+            break;
+        }
 
         SetAction(ExecuteAction);
     }
@@ -98,9 +111,9 @@ internal class ManageSecretsRootCommand : RootCommand
             Environment.Exit(0);
         }
 
-        IGetOutputData getOutputData = IGetOutputData.GetDefault(contentForEdit, 
+        IGetOutputData getOutputData = IGetOutputData.GetDefault(contentForEdit,
             parseResult.GetValue(_editor),
-            parseResult.GetValue(_leftovers) ?? [], 
+            parseResult.GetValue(_leftovers) ?? [],
             format).Unwrap();
 
         string contentFromEditor = getOutputData.GetOutput().Unwrap();
@@ -111,7 +124,7 @@ internal class ManageSecretsRootCommand : RootCommand
         var outDict = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonToDump) ?? [];
         if (inDict.Count == outDict.Count && inDict.SequenceEqual(outDict))
         {
-            Environment.ExitCode =  ExitCodes.LogicalValueHasNotChanged;
+            Environment.ExitCode = (int)ExitCodes.LogicalValueHasNotChanged;
             return;
         }
 

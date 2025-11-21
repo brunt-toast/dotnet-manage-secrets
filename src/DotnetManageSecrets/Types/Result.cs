@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Dev.JoshBrunton.DotnetManageSecrets.Enums.Enums;
 
 namespace Dev.JoshBrunton.DotnetManageSecrets.Types;
 
@@ -28,6 +29,14 @@ internal class Result<T> : Result
         return new Result<T>
         {
             _err = err
+        };
+    }
+
+    public static Result<T> Err(ExitCodes err)
+    {
+        return new Result<T>
+        {
+            _err = (int)err
         };
     }
 

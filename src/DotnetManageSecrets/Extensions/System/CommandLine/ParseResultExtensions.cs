@@ -1,8 +1,8 @@
-﻿using Dev.JoshBrunton.DotnetManageSecrets.Consts;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.CommandLine;
 using System.Text;
+using Dev.JoshBrunton.DotnetManageSecrets.Enums.Enums;
 
 namespace Dev.JoshBrunton.DotnetManageSecrets.Extensions.System.CommandLine;
 
@@ -18,7 +18,7 @@ internal static class ParseResultExtensions
             }
 
             Console.Error.WriteLine(string.Join(Environment.NewLine, parseResult.Errors.Select(x => x.Message)));
-            Environment.Exit(ExitCodes.ParseFailure);
+            Environment.Exit((int)ExitCodes.ParseFailure);
         }
     }
 }

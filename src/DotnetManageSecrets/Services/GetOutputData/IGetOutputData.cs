@@ -1,10 +1,10 @@
-﻿using Dev.JoshBrunton.DotnetManageSecrets.Consts;
-using Dev.JoshBrunton.DotnetManageSecrets.Types;
+﻿using Dev.JoshBrunton.DotnetManageSecrets.Types;
 using System;
 using System.Collections.Generic;
 using System.CommandLine;
 using System.Text;
 using Dev.JoshBrunton.DotnetManageSecrets.Enums;
+using Dev.JoshBrunton.DotnetManageSecrets.Enums.Enums;
 
 namespace Dev.JoshBrunton.DotnetManageSecrets.Services.GetOutputData;
 

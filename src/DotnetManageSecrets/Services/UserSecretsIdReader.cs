@@ -1,7 +1,7 @@
-﻿using Dev.JoshBrunton.DotnetManageSecrets.Consts;
-using Dev.JoshBrunton.DotnetManageSecrets.Types;
+﻿using Dev.JoshBrunton.DotnetManageSecrets.Types;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
+using Dev.JoshBrunton.DotnetManageSecrets.Enums.Enums;
 
 namespace Dev.JoshBrunton.DotnetManageSecrets.Services;
 internal static partial class UserSecretsIdReader

@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
-using Dev.JoshBrunton.DotnetManageSecrets.Consts;
 using Dev.JoshBrunton.DotnetManageSecrets.Enums;
+using Dev.JoshBrunton.DotnetManageSecrets.Enums.Enums;
 using Dev.JoshBrunton.DotnetManageSecrets.Types;
 
 namespace Dev.JoshBrunton.DotnetManageSecrets.Services.GetOutputData;

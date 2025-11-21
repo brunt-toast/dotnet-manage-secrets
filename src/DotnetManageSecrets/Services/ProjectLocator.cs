@@ -1,6 +1,6 @@
-﻿using Dev.JoshBrunton.DotnetManageSecrets.Consts;
-using System.CommandLine;
+﻿using System.CommandLine;
 using System.Diagnostics.CodeAnalysis;
+using Dev.JoshBrunton.DotnetManageSecrets.Enums.Enums;
 using Dev.JoshBrunton.DotnetManageSecrets.Types;
 
 namespace Dev.JoshBrunton.DotnetManageSecrets.Services;

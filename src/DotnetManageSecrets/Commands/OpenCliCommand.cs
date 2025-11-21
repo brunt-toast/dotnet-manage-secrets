@@ -1,8 +1,8 @@
 ﻿using Dev.JoshBrunton.DotnetManageSecrets.Arguments.OpenCliCommandArguments;
-using Dev.JoshBrunton.DotnetManageSecrets.Consts;
 using Dev.JoshBrunton.DotnetManageSecrets.IO;
 using Dev.JoshBrunton.DotnetManageSecrets.OpenCli;
 using System.CommandLine;
+using Dev.JoshBrunton.DotnetManageSecrets.Enums.Enums;
 
 namespace Dev.JoshBrunton.DotnetManageSecrets.Commands;
 
@@ -25,7 +25,7 @@ internal class OpenCliCommand : Command
         if (commandName is null)
         {
             Console.Error.WriteLine($"The argument \"{_commandNameArg}\" is required.");
-            return ExitCodes.InvalidArgument;
+            return (int)ExitCodes.InvalidArgument;
         }
 
         var command = new ManageSecretsRootCommand().Parse(commandName).CommandResult.Command;
