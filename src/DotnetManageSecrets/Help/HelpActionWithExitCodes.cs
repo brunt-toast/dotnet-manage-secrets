@@ -62,7 +62,12 @@ internal class HelpActionWithExitCodes : SynchronousCommandLineAction
             .GetMember(value.ToString())
             .FirstOrDefault();
 
-        return member?.GetCustomAttribute<DisplayAttribute>()?.GetDescription() ?? string.Empty;
+        string obsoleteMessage = member?.GetCustomAttribute<ObsoleteAttribute>()?.Message ?? string.Empty;
+        string description = member?.GetCustomAttribute<DisplayAttribute>()?.GetDescription() ?? string.Empty;
+
+        return string.IsNullOrWhiteSpace(obsoleteMessage)
+            ? description
+            : $"{description} (OBSOLETE: {obsoleteMessage})";
     }
 
     private static void PrintColumns(
