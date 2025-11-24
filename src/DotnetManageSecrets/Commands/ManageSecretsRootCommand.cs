@@ -34,6 +34,7 @@ internal class ManageSecretsRootCommand : RootCommand
     private readonly HideValuesFlag _hideValues = new();
     private readonly EscapeWslFlag _escapeWsl = new();
     private readonly ReadonlyFlag _readonly = new();
+    private readonly SourceFileOption _sourceFile = new();
     private readonly ProjectOption _project = new();
     private readonly EditorOption _editor = new();
     private readonly FormatOption _format = new();
@@ -44,6 +45,7 @@ internal class ManageSecretsRootCommand : RootCommand
         Options.Add(_hideValues);
         Options.Add(_escapeWsl);
         Options.Add(_readonly);
+        Options.Add(_sourceFile);
         Options.Add(_project);
         Options.Add(_editor);
         Options.Add(_format);
@@ -82,14 +84,23 @@ internal class ManageSecretsRootCommand : RootCommand
         using var _ = ConsoleDiversion.ForParseResult(parseResult);
         parseResult.TerminateIfParseErrors();
 
-        string csProjPath = ProjectLocator.TryGetCsprojPath(parseResult, _project).Unwrap();
-        string guid = UserSecretsIdReader.TryGetSecretsId(csProjPath).Unwrap();
-        string secretsFolderPath = SecretsFolderLocator.GetFolderForId(guid, parseResult.GetValue(_escapeWsl));
-        string secretsFilePath = Path.Join(secretsFolderPath, "secrets.json");
+        string secretsFilePath;
+
+        if (parseResult.TryGetValue(_sourceFile, out FileInfo? sourceFile))
+        {
+            secretsFilePath = sourceFile.FullName;
+        }
+        else
+        {
+            string csProjPath = ProjectLocator.TryGetCsprojPath(parseResult, _project).Unwrap();
+            string guid = UserSecretsIdReader.TryGetSecretsId(csProjPath).Unwrap();
+            string secretsFolderPath = SecretsFolderLocator.GetFolderForId(guid, parseResult.GetValue(_escapeWsl));
+            Directory.CreateDirectory(secretsFolderPath);
+            secretsFilePath = Path.Join(secretsFolderPath, "secrets.json");
+        }
 
         if (!File.Exists(secretsFilePath))
         {
-            Directory.CreateDirectory(secretsFolderPath);
             File.WriteAllText(secretsFilePath, "{}");
         }
 
