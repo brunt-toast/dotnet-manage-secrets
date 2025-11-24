@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Dev.JoshBrunton.DotnetManageSecrets.Enums.Enums;
 
-internal enum ExitCodes
+public enum ExitCodes
 {
     [Display(Name = "Unknown error", Description = "Something went wrong, but the specific cause couldn't be determined with any certainty. This is probably a result of a bug.")]
     UnknownError = -1,
