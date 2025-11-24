@@ -86,7 +86,7 @@ internal class HelpActionWithExitCodes : SynchronousCommandLineAction
             string left = i < leftLines.Count ? leftLines[i] : "";
             string right = i < rightLines.Count ? rightLines[i] : "";
 
-            Console.WriteLine(
+            Console.WriteLine("  " + 
                 left.PadRight(leftWidth) + " " + 
                 right.PadRight(rightWidth));
         }
