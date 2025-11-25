@@ -1,0 +1,175 @@
+﻿@page "/"
+@using Dev.JoshBrunton.DotnetManageSecrets.Website.Icons
+@inject NavigationManager NavMgr
+
+<PageTitle>dotnet-manage-secrets</PageTitle>
+
+<div class="container">
+    <div class="row">
+        <div class="col-12 col-md-2"></div>
+        <div class="col-12 col-md-8">
+            <div style="margin-top: 30svh;">
+                <div style="text-align: center;">
+                    <h1 style="color: #ba83ff;">dotnet-manage-secrets</h1>
+                    <p>
+                        Manage .NET user secrets in the format and editor of your choice!
+                    </p>
+                    <FluentButton Appearance="Appearance.Accent"
+                                  BackgroundColor="#08872b"
+                                  Color="white"
+                                  OnClick="@(() => NavMgr.NavigateTo("https://github.com/brunt-toast/dotnet-manage-secrets"))">
+                        <span class="m-1">
+                            <GithubIcon />
+                            GitHub
+                        </span>
+                    </FluentButton>
+                    <FluentButton Appearance="Appearance.Accent"
+                                  BackgroundColor="#00467c"
+                                  Color="white"
+                                  OnClick="@(() => NavMgr.NavigateTo("https://www.nuget.org/packages/DotnetManageSecrets/"))">
+                        <span class="m-1">
+                            <NugetIcon />
+                            NuGet
+                        </span>
+                    </FluentButton>
+                </div>
+            </div>
+            
+            <div class="mt-5" style="background: #1a1a1a; border: 1px solid darkgrey; border-radius: 4px; padding: 1em; text-align: left;">
+                <FluentTabs>
+                    <FluentTab Label="Install as a .NET tool">
+                        dotnet tool install -g DotnetManageSecrets
+                    </FluentTab>
+                    <FluentTab Label="Download the latest binaries">
+                        <a href="https://github.com/brunt-toast/dotnet-manage-secrets/actions/">
+                            For Windows x86/64 and Linux
+                        </a>
+                    </FluentTab>
+                    <FluentTab Label="Compile from source">
+                        git clone https://github.com/brunt-toast/dotnet-manage-secrets &amp;&amp;
+                        cd dotnet-manage-secrets &amp;&amp;
+                        dotnet tool uninstall -g DotnetManageSecrets;
+                        rm -r ./src/DotnetManageSecrets/bin/nupkg;
+                        dotnet tool restore && dotnet cake &amp;&amp;
+                        dotnet tool install -g --add-source ./src/DotnetManageSecrets/bin/nupkg DotnetManageSecrets
+                    </FluentTab>
+                </FluentTabs>
+            </div>
+
+            <div class="mt-1 mb-5" style="background: #1a1a1a; border: 1px solid darkgrey; border-radius: 4px; padding: 1em;">
+                <section>
+                    <h2>What is dotnet-manage-secrets?</h2>
+                    <p>
+                        dotnet-manage-secrets is a CLI tool that enables developers to manage .NET user secrets
+                        using their preferred editor and schema.
+                    </p>
+
+                    <p>
+                        The tool is inspired by Visual Studio's secrets editor. While it aids the same fundamental task,
+                        it uses the native "flattened JSON" format, and is only available within Visual Studio for projects
+                        supported by Connected Services. dotnet-manage-secrets brings this workflow to every editor and
+                        schema.
+                    </p>
+                </section>
+                <section>
+                    <h2>Features</h2>
+
+                    <h3>Export secrets using --readonly|-r</h3>
+                    <p>
+                        We can skip launching the editor and send our user secrets directly to
+                        output using the --readonly flag.
+
+                        <code>
+                            <pre>
+~/repos/project# dotnet manage-secrets --readonly
+{
+    "apiAccess": {
+        "email": "someone@example.com",
+        "apiKey": "superSecretKey"
+    }
+}
+                        </pre>
+                        </code>
+                    </p>
+
+                    <h3>Swap schemas using --format|-f</h3>
+                    <p>
+                        More comfortable in a schema other than JSON?
+                        Try YAML, INI, TOML, and more!
+
+                        <code>
+                            <pre>
+~/repos/project# dotnet manage-secrets -r --format yaml
+apiAccess:
+  email: ''
+  apiKey: ''
+                        </pre>
+                        </code>
+                    </p>
+
+                    <h3>Obfuscate values with --hide-values|-x</h3>
+                    <p>
+                        Values can be obfuscated with the --hide-values flag, ideal
+                        for sharing the config schema without sharing any secrets.
+
+                        <code>
+                            <pre>
+~/repos/project# dotnet manage-secrets -r --hide-values
+{
+    "apiAccess": {
+        "email": "",
+        "apiKey": ""
+    }
+}
+                        </pre>
+                        </code>
+                    </p>
+
+                    <h3>Escape WSL with --escape-wsl|-w</h3>
+                    <p>
+                        Developers using WSL needn't install the tool twice - just use --escape-wsl to
+                        interact directly with Windows' secret store.
+
+                        <code>
+                            <pre>
+~/repos/project# dotnet manage-secrets -r 
+{
+    "signingKeyPath": "/home/me/keys/myKey.asc"
+}
+
+~/repos/project# dotnet manage-secrets -r --escape-wsl
+{
+    "signingKeyPath": "C:\\Users\\Me\\keys\\myKey.asc"
+}
+                        </pre>
+                        </code>
+                    </p>
+
+                    <h3>Load values automatically with redirected input</h3>
+                    <p>
+                        Redirected input will be treated as if it was typed into the editor,
+                        and automatically saved into the secrets store.
+
+                        <code>
+                            <pre>
+~/downloads# dotnet manage-secrets -r --project ~/repos/project
+{}
+
+~/downloads# cat secrets.json | dotnet manage-secrets --project ~/repos/project
+
+~/downloads# dotnet manage-secrets -r --project ~/repos/project
+{
+    "apiAccess": {
+        "email": "someone@example.com",
+        "apiKey": "superSecretKey"
+    }
+}
+                        </pre>
+                        </code>
+                    </p>
+                </section>
+            </div>
+        </div>
+        <div class="col-12 col-md-2"></div>
+    </div>
+</div>
