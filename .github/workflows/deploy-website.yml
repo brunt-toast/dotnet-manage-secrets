@@ -36,7 +36,7 @@ jobs:
 
     - name: Publish Blazor WASM project
       run: |
-        dotnet publish src/DotnetManageSecrets.Website/DotnetManageSecrets.Website.csproj -c Release -o publish
+        dotnet publish site/DotnetManageSecrets.Website/DotnetManageSecrets.Website.csproj -c Release -o publish
 
     - name: Copy wwwroot to expected output folder
       run: |
