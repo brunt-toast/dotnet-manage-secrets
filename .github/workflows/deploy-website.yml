@@ -1,0 +1,53 @@
+name: Deploy Blazor WASM to GitHub Pages (Windows)
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: windows-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.x
+
+    - name: Use wasm-tools for treeshake
+      run: |
+        dotnet workload install wasm-tools
+
+    - name: Publish Blazor WASM project
+      run: |
+        dotnet publish src/DotnetManageSecrets.Website/DotnetManageSecrets.Website.csproj -c Release -o publish
+
+    - name: Copy wwwroot to expected output folder
+      run: |
+        mkdir _site
+        xcopy publish\wwwroot _site /E /I /Y
+
+    - name: Upload artifact for GitHub Pages
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: _site
+
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
