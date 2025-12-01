@@ -7,7 +7,7 @@ namespace Dev.JoshBrunton.DotnetManageSecrets.Services;
 
 internal static class ProjectLocator
 {
-    public static Result<string> TryGetCsprojPath(ParseResult parseResult, Option<string> projectOption)
+    public static Result<string> TryGetProjectPath(ParseResult parseResult, Option<string> projectOption)
     {
         if (parseResult.GetValue(projectOption) is not { } projectPath)
         {
@@ -22,12 +22,12 @@ internal static class ProjectLocator
 
         if (Directory.Exists(projectPath))
         {
-            if (TryGetCsprojFromDirectory(projectPath, out string? csprojPath))
+            if (TryGetProjectFromDirectory(projectPath, out string? projPath))
             {
-                return Result<string>.Ok(csprojPath);
+                return Result<string>.Ok(projPath);
             }
 
-            Console.Error.WriteLine($"Couldn't find any .csproj files with user secrets enabled under directory {projectPath}");
+            Console.Error.WriteLine($"Couldn't find any .*proj files with user secrets enabled under directory {projectPath}");
             return Result<string>.Err(ExitCodes.NoMatchingFiles);
 
         }
@@ -36,11 +36,11 @@ internal static class ProjectLocator
         return Result<string>.Err(ExitCodes.DirectoryNotFound);
     }
 
-    private static bool TryGetCsprojFromDirectory(string directory, [NotNullWhen(true)] out string? path)
+    private static bool TryGetProjectFromDirectory(string directory, [NotNullWhen(true)] out string? path)
     {
         path = null;
 
-        string[] projects = Directory.GetFiles(directory, "*.csproj", SearchOption.AllDirectories)
+        string[] projects = Directory.GetFiles(directory, "*.*proj", SearchOption.AllDirectories)
         .Where(x => UserSecretsIdReader.TryGetSecretsId(x).IsOk)
         .ToArray();
 
@@ -55,7 +55,7 @@ internal static class ProjectLocator
             return true;
         }
 
-        Console.WriteLine("Multiple viable .csproj files. Did you mean...");
+        Console.WriteLine("Multiple viable .*proj files. Did you mean...");
         for (int i = 0; i < projects.Length; i++)
         {
             Console.WriteLine($"[{i + 1}] {projects[i]}");

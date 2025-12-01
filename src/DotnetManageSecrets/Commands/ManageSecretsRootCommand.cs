@@ -24,7 +24,7 @@ internal class ManageSecretsRootCommand : RootCommand
     private const string ConstDescription = """
                                        Manage dotnet user secrets with your editor and format of choice. 
                                        
-                                       This program reads the user secrets ID of a given C# project and looks for the associated file in the user secrets folder. It reads the secrets into a sensible format and presents them using the configured editor, then re-formats the edited file into .NET's expected schema before saving. 
+                                       This program reads the user secrets ID of a given .NET project and looks for the associated file in the user secrets folder. It reads the secrets into a sensible format and presents them using the configured editor, then re-formats the edited file into .NET's expected schema before saving. 
                                        
                                        While editing, a copy of the secrets is stored in the system's temp directory. The file is deleted immediately after closing the editor and loading the new values into memory. Note that the file may persist if the program is not allowed to exit gracefully.
                                        
@@ -34,6 +34,7 @@ internal class ManageSecretsRootCommand : RootCommand
     private readonly HideValuesFlag _hideValues = new();
     private readonly EscapeWslFlag _escapeWsl = new();
     private readonly ReadonlyFlag _readonly = new();
+    private readonly SourceFileOption _sourceFile = new();
     private readonly ProjectOption _project = new();
     private readonly EditorOption _editor = new();
     private readonly FormatOption _format = new();
@@ -44,6 +45,7 @@ internal class ManageSecretsRootCommand : RootCommand
         Options.Add(_hideValues);
         Options.Add(_escapeWsl);
         Options.Add(_readonly);
+        Options.Add(_sourceFile);
         Options.Add(_project);
         Options.Add(_editor);
         Options.Add(_format);
@@ -82,14 +84,23 @@ internal class ManageSecretsRootCommand : RootCommand
         using var _ = ConsoleDiversion.ForParseResult(parseResult);
         parseResult.TerminateIfParseErrors();
 
-        string csProjPath = ProjectLocator.TryGetCsprojPath(parseResult, _project).Unwrap();
-        string guid = UserSecretsIdReader.TryGetSecretsId(csProjPath).Unwrap();
-        string secretsFolderPath = SecretsFolderLocator.GetFolderForId(guid, parseResult.GetValue(_escapeWsl));
-        string secretsFilePath = Path.Join(secretsFolderPath, "secrets.json");
+        string secretsFilePath;
+
+        if (parseResult.TryGetValue(_sourceFile, out FileInfo? sourceFile))
+        {
+            secretsFilePath = sourceFile.FullName;
+        }
+        else
+        {
+            string projectPath = ProjectLocator.TryGetProjectPath(parseResult, _project).Unwrap();
+            string guid = UserSecretsIdReader.TryGetSecretsId(projectPath).Unwrap();
+            string secretsFolderPath = SecretsFolderLocator.GetFolderForId(guid, parseResult.GetValue(_escapeWsl));
+            Directory.CreateDirectory(secretsFolderPath);
+            secretsFilePath = Path.Join(secretsFolderPath, "secrets.json");
+        }
 
         if (!File.Exists(secretsFilePath))
         {
-            Directory.CreateDirectory(secretsFolderPath);
             File.WriteAllText(secretsFilePath, "{}");
         }
 

@@ -1,5 +1,6 @@
 ﻿using System.CommandLine;
 using System.Reflection;
+using Dev.JoshBrunton.DotnetManageSecrets.Enums.Enums;
 using Dev.JoshBrunton.DotnetManageSecrets.OpenCli.Types;
 using Newtonsoft.Json;
 
@@ -56,7 +57,7 @@ internal class OpenCliParser
             Arguments = command.Arguments.Select(OpenCliArgument.FromSysCommandLineArgument).ToArray(),
             Options = command.Options.Select(OpenCliOption.FromSysCommandLineOption).ToArray(),
             Commands = command.Subcommands.Select(OpenCliCommand.FromSysCommandLineCommand).ToArray(),
-            ExitCodes = [],
+            ExitCodes = Enum.GetValues<ExitCodes>().Select(OpenCliExitCode.FromEnum).ToArray(),
             Examples = [],
             Interactive = false,
             Metadata = []
