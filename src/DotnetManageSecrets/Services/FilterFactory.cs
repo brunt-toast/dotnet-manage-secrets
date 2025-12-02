@@ -15,6 +15,7 @@ internal static class FilterFactory
             DataFormats.Xml => new XmlFilter(),
             DataFormats.Toml => new TomlFilter(),
             DataFormats.Ini => new IniFilter(),
+            DataFormats.Env => new EnvFilter(),
             _ => throw new ArgumentOutOfRangeException()
         };
     }
@@ -28,6 +29,7 @@ internal static class FilterFactory
             DataFormats.Xml => "xml",
             DataFormats.Toml => "toml",
             DataFormats.Ini => "ini",
+            DataFormats.Env => "env",
             _ => throw new ArgumentOutOfRangeException()
         };
     }
