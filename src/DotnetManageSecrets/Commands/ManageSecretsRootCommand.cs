@@ -53,6 +53,7 @@ internal class ManageSecretsRootCommand : RootCommand
         Arguments.Add(_leftovers);
 
         Subcommands.Add(new OpenCliCommand());
+        Subcommands.Add(new ReadEnvironmentCommand());
 
         foreach (var t in Options)
         {
