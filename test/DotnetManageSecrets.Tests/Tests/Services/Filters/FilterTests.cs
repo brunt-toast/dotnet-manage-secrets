@@ -28,8 +28,8 @@ public class FilterTests
                        }
                        """;
 
-        string cleaned = instance.Clean(input);
-        string smudged = instance.Smudge(cleaned);
+        string cleaned = instance.Clean(input).Unwrap();
+        string smudged = instance.Smudge(cleaned).Unwrap();
 
         Assert.AreEqual(input, smudged);
     }

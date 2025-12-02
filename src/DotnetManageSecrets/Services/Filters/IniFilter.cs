@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using System.Text;
 using System.Web;
+using Dev.JoshBrunton.DotnetManageSecrets.Types;
 
 namespace Dev.JoshBrunton.DotnetManageSecrets.Services.Filters;
 
@@ -10,12 +11,12 @@ namespace Dev.JoshBrunton.DotnetManageSecrets.Services.Filters;
 /// </remarks>
 internal class IniFilter : IFilter
 {
-    public string Clean(string input)
+    public Result<string> Clean(string input)
     {
         return JsonToIni(input);
     }
 
-    public string Smudge(string input)
+    public Result<string> Smudge(string input)
     {
         return IniToJson(input);
     }

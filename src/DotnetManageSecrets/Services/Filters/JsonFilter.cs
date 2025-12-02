@@ -1,11 +1,12 @@
-﻿using Newtonsoft.Json;
+﻿using Dev.JoshBrunton.DotnetManageSecrets.Types;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Dev.JoshBrunton.DotnetManageSecrets.Services.Filters;
 
 internal class JsonFilter : IFilter
 {
-    public string Clean(string json)
+    public Result<string> Clean(string json)
     {
         var rootToken = JToken.Parse(json);
         var dict = rootToken.ToObject<Dictionary<string, object>>() ?? throw new Exception();
@@ -20,7 +21,7 @@ internal class JsonFilter : IFilter
         return retToken.ToString();
     }
 
-    public string Smudge(string json)
+    public Result<string> Smudge(string json)
     {
         var obj = JObject.Parse(json);
         var flat = Flatten(obj);

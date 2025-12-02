@@ -5,7 +5,7 @@ using Dev.JoshBrunton.DotnetManageSecrets.Enums.Enums;
 
 namespace Dev.JoshBrunton.DotnetManageSecrets.Types;
 
-internal class Result<T> : Result
+public class Result<T> 
 {
     private T? _value;
     private int? _err;
@@ -49,9 +49,14 @@ internal class Result<T> : Result
 
         return _value!;
     }
-}
 
-class Result
-{
+    public static implicit operator Result<T>(T value)
+    {
+        return Ok(value);
+    }
 
+    public static implicit operator Result<T>(ExitCodes value)
+    {
+        return Err(value);
+    }
 }

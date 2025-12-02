@@ -53,6 +53,7 @@ internal class ManageSecretsRootCommand : RootCommand
         Arguments.Add(_leftovers);
 
         Subcommands.Add(new OpenCliCommand());
+        Subcommands.Add(new ReadEnvironmentCommand());
 
         foreach (var t in Options)
         {
@@ -70,10 +71,13 @@ internal class ManageSecretsRootCommand : RootCommand
 
     public void Execute(string[] args)
     {
-        string defaultRspPath = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config", "dotnet-manage-secrets.rsp");
-        if (File.Exists(defaultRspPath))
+        if (args.All(x => x != "--no-autorsp"))
         {
-            args = [.. args, $"@{defaultRspPath}"];
+            string defaultRspPath = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config", "dotnet-manage-secrets.rsp");
+            if (File.Exists(defaultRspPath))
+            {
+                args = [.. args, $"@{defaultRspPath}"];
+            }
         }
 
         Parse(args).Invoke();
@@ -114,7 +118,7 @@ internal class ManageSecretsRootCommand : RootCommand
             jsonFromSecretsFile = ValueObfuscator.Obfuscate(jsonFromSecretsFile);
         }
 
-        string contentForEdit = filter.Clean(jsonFromSecretsFile);
+        string contentForEdit = filter.Clean(jsonFromSecretsFile).Unwrap();
 
         if (parseResult.GetValue(_readonly))
         {
@@ -129,7 +133,7 @@ internal class ManageSecretsRootCommand : RootCommand
 
         string contentFromEditor = getOutputData.GetOutput().Unwrap();
 
-        string jsonToDump = filter.Smudge(contentFromEditor);
+        string jsonToDump = filter.Smudge(contentFromEditor).Unwrap();
 
         var inDict = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonFromSecretsFile) ?? [];
         var outDict = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonToDump) ?? [];

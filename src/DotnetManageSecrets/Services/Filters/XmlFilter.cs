@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
+using Dev.JoshBrunton.DotnetManageSecrets.Types;
 
 namespace Dev.JoshBrunton.DotnetManageSecrets.Services.Filters;
 
@@ -13,13 +14,13 @@ internal class XmlFilter : IFilter
 {
     private readonly JsonFilter _jsonFilter = new();
 
-    public string Clean(string input)
+    public Result<string> Clean(string input)
     {
-        string nestedJson = _jsonFilter.Clean(input);
+        string nestedJson = _jsonFilter.Clean(input).Unwrap();
         return JsonToXml(nestedJson);
     }
 
-    public string Smudge(string input)
+    public Result<string> Smudge(string input)
     {
         var nestedJson = XmlToJson(input);
         return _jsonFilter.Smudge(nestedJson);

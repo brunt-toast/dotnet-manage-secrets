@@ -8,5 +8,7 @@ public enum DataFormats
     Yml = Yaml,
     Xml,
     Toml,
-    Ini
+    Ini,
+    Env,
+    DotEnv = Env,
 }
