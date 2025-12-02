@@ -5,7 +5,7 @@ using Dev.JoshBrunton.DotnetManageSecrets.Enums.Enums;
 
 namespace Dev.JoshBrunton.DotnetManageSecrets.Types;
 
-internal class Result<T> : Result
+internal class Result<T> 
 {
     private T? _value;
     private int? _err;
@@ -49,9 +49,4 @@ internal class Result<T> : Result
 
         return _value!;
     }
-}
-
-class Result
-{
-
 }
