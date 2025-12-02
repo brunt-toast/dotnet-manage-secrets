@@ -46,12 +46,7 @@
                         </a>
                     </FluentTab>
                     <FluentTab Label="Compile from source">
-                        git clone https://github.com/brunt-toast/dotnet-manage-secrets &amp;&amp;
-                        cd dotnet-manage-secrets &amp;&amp;
-                        dotnet tool uninstall -g DotnetManageSecrets;
-                        rm -r ./src/DotnetManageSecrets/bin/nupkg;
-                        dotnet tool restore && dotnet cake &amp;&amp;
-                        dotnet tool install -g --add-source ./src/DotnetManageSecrets/bin/nupkg DotnetManageSecrets
+                        git clone https://github.com/brunt-toast/dotnet-manage-secrets; cd dotnet-manage-secrets; make install
                     </FluentTab>
                 </FluentTabs>
             </div>
