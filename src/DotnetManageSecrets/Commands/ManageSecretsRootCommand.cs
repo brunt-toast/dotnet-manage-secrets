@@ -118,7 +118,7 @@ internal class ManageSecretsRootCommand : RootCommand
             jsonFromSecretsFile = ValueObfuscator.Obfuscate(jsonFromSecretsFile);
         }
 
-        string contentForEdit = filter.Clean(jsonFromSecretsFile);
+        string contentForEdit = filter.Clean(jsonFromSecretsFile).Unwrap();
 
         if (parseResult.GetValue(_readonly))
         {
@@ -133,7 +133,7 @@ internal class ManageSecretsRootCommand : RootCommand
 
         string contentFromEditor = getOutputData.GetOutput().Unwrap();
 
-        string jsonToDump = filter.Smudge(contentFromEditor);
+        string jsonToDump = filter.Smudge(contentFromEditor).Unwrap();
 
         var inDict = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonFromSecretsFile) ?? [];
         var outDict = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonToDump) ?? [];

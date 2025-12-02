@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using Dev.JoshBrunton.DotnetManageSecrets.Types;
 using Tomlyn;
 using Tomlyn.Model;
 
@@ -7,13 +8,13 @@ internal class TomlFilter : IFilter
 {
     private readonly JsonFilter _jsonFilter = new();
 
-    public string Clean(string input)
+    public Result<string> Clean(string input)
     {
-        string nestedJson = _jsonFilter.Clean(input);
+        string nestedJson = _jsonFilter.Clean(input).Unwrap();
         return JsonToToml(nestedJson);
     }
 
-    public string Smudge(string input)
+    public Result<string> Smudge(string input)
     {
         var nestedJson = TomlToJson(input);
         return _jsonFilter.Smudge(nestedJson);

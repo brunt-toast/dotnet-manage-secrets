@@ -1,7 +1,9 @@
-﻿namespace Dev.JoshBrunton.DotnetManageSecrets.Services.Filters;
+﻿using Dev.JoshBrunton.DotnetManageSecrets.Types;
+
+namespace Dev.JoshBrunton.DotnetManageSecrets.Services.Filters;
 
 public interface IFilter
 {
-    string Clean(string input);
-    string Smudge(string input);
+    Result<string> Clean(string input);
+    Result<string> Smudge(string input);
 }

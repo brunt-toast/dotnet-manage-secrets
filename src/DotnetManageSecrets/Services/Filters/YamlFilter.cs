@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Dev.JoshBrunton.DotnetManageSecrets.Types;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
@@ -8,13 +9,13 @@ internal class YamlFilter : IFilter
 {
     private readonly JsonFilter _jsonFilter = new();
 
-    public string Clean(string input)
+    public Result<string> Clean(string input)
     {
-        string nestedJson = _jsonFilter.Clean(input);
+        string nestedJson = _jsonFilter.Clean(input).Unwrap();
         return JsonToYaml(nestedJson);
     }
 
-    public string Smudge(string input)
+    public Result<string> Smudge(string input)
     {
         var nestedJson = YamlToJson(input);
         return _jsonFilter.Smudge(nestedJson);

@@ -3,16 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Dev.JoshBrunton.DotnetManageSecrets.Types;
 
 namespace Dev.JoshBrunton.DotnetManageSecrets.Services.Filters;
 internal class NoopFilter : IFilter
 {
-    public string Clean(string input)
+    public Result<string> Clean(string input)
     {
         return input;
     }
 
-    public string Smudge(string input)
+    public Result<string> Smudge(string input)
     {
         return input;
     }
