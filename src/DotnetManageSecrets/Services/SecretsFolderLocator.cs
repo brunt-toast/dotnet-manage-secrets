@@ -33,7 +33,9 @@ internal static class SecretsFolderLocator
             wslPathProcess.StartInfo = wslPathPsi;
             wslPathProcess.Start();
             wslPathProcess.WaitForExit();
-            return wslPathProcess.StandardOutput.ReadToEnd();
+            var ret = wslPathProcess.StandardOutput.ReadToEnd();
+            ret = ret.Replace("\r", "").Replace("\n", "");
+            return ret;
         }
         else
         {
