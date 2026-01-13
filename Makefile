@@ -16,3 +16,4 @@ restore:
 	dotnet tool restore
 
 	find . -type f -name *.*proj | xargs -I{} sh -c 'dotnet workload restore --project "{}"' 
+

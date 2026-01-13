@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>dotnet-manage-secrets</ToolCommandName>
+    <PackageOutputPath>./bin/nupkg</PackageOutputPath>
+    <UserSecretsId>58f4c23b-6a76-4ac3-a58a-7db4661b3204</UserSecretsId>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>DotnetManageSecrets</PackageId>
+    <PackageVersion>$(Version)</PackageVersion>
+    <Authors>Josh Brunton</Authors>
+    <Description>Manage .NET User Secrets with your format and editor of choice!</Description>
+    <Copyright>Josh Brunton 2025</Copyright>
+    <PackageProjectUrl>https://brunt-toast.github.io/dotnet-manage-secrets</PackageProjectUrl>
+    <PackageIcon></PackageIcon>
+    <RepositoryUrl>https://github.com/brunt-toast/dotnet-manage-secrets.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>terminal cli tool windows macos linux freebsd json yaml yml xml toml ini env</PackageTags>
+    <PackageReleaseNotes>https://github.com/brunt-toast/dotnet-manage-secrets/releases/$(Version)</PackageReleaseNotes>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.CommandLine" Version="2.0.0-rc.1.25451.107" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Application\Application.csproj" />
+  </ItemGroup>
+</Project>
