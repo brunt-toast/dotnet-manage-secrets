@@ -1,0 +1,61 @@
+name: Publish NuGet
+
+on:
+  push:
+    tags: [ build/*, ci/*, version/*, v/* ]
+  workflow_dispatch:
+
+jobs:
+  get-version:
+    name: Get version
+    runs-on: ubuntu-latest
+
+    outputs:
+      version: ${{ steps.get_version.outputs.version }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10.0
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore src/Cli/Cli.csproj
+
+      - name: Get project version
+        id: get_version
+        shell: bash
+        run: |
+          VERSION=$(dotnet msbuild src/Cli/Cli.csproj -nologo -getproperty:Version | tail -n 1)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+  pack:
+    name: Create NuGet package
+    runs-on: ubuntu-latest
+    needs: get-version
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10.0
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Pack NuGet package
+        run: >
+          dotnet pack src/Cli/Cli.csproj
+          -c Release
+          -p:PackageVersion=${{ needs.get-version.outputs.version }}
+          -o ./artifacts/nuget
+
+      - name: Upload NuGet package artifact
+        if: ${{ !env.ACT }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: DotnetManageSecrets-NuGet-${{ needs.get-version.outputs.version }}
+          path: artifacts/nuget/*.nupkg
+
