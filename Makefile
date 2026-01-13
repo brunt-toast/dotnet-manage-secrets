@@ -17,3 +17,13 @@ restore:
 
 	find . -type f -name *.*proj | xargs -I{} sh -c 'dotnet workload restore --project "{}"' 
 
+install: restore
+
+	rm -r ./src/Cli/bin/nupkg || true
+
+	dotnet tool uninstall -g DotnetManageSecrets || true
+
+	dotnet pack ./src/Cli -c Release
+
+	dotnet tool install -g --add-source ./src/Cli/bin/nupkg DotnetManageSecrets --allow-downgrade 
+
