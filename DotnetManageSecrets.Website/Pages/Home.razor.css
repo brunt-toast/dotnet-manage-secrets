@@ -1,0 +1,12 @@
+﻿body {
+    background: #333333;
+    color: #ffffff;
+}
+
+pre {
+    padding: 1em;
+    background: #333333;
+    border: 1px solid darkgrey;
+    border-radius: 4px;
+    width: min(100%, fit-content);
+}
