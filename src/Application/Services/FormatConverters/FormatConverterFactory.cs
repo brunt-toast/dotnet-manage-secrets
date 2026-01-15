@@ -10,6 +10,7 @@ internal class FormatConverterFactory : IFormatConverterFactory
         return format switch
         {
             DataFormats.Json => new JsonFormatConverter(),
+            DataFormats.MinifiedJson => new MinifiedJsonFormatConverter(),
             DataFormats.FlatJson => new NoopFormatConverter(),
             DataFormats.Yaml => new YamlFormatConverter(),
             DataFormats.Xml => new XmlFormatConverter(),

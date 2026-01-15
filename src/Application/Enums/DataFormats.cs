@@ -4,6 +4,7 @@ public enum DataFormats
 {
     Json,
     FlatJson,
+    MinifiedJson,
     Yaml,
     Yml = Yaml,
     Xml,
