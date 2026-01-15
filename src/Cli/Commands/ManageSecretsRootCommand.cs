@@ -66,6 +66,21 @@ internal class ManageSecretsRootCommand : RootCommand
         SetAction(ExecuteAction);
     }
 
+    public int Execute(string[] args)
+    {
+        if (!args.Contains("--no-autorsp"))
+        {
+            string defaultRspPath = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), 
+                ".config", "dotnet-manage-secrets.rsp");
+            if (File.Exists(defaultRspPath))
+            {
+                args = [.. args, $"@{defaultRspPath}"];
+            }
+        }
+
+        return Parse(args).Invoke();
+    }
+
     private int ExecuteAction(ParseResult parseResult)
     {
         string projectQuery = parseResult.GetValue(_projectQueryOption) ?? string.Empty;
