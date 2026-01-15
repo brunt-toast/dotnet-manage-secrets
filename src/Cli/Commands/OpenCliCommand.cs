@@ -16,6 +16,8 @@ internal class OpenCliCommand : Command
         base("opencli", "Gather information about this command in the OpenCLI format.")
     {
         _serviceProvider = serviceProvider;
+
+        SetAction(ExecuteAction);
     }
 
     private int ExecuteAction(ParseResult _)
