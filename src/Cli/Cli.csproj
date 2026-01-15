@@ -32,5 +32,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Application\Application.csproj" />
+    <ProjectReference Include="..\LibOpenCli\LibOpenCli.csproj" />
   </ItemGroup>
 </Project>

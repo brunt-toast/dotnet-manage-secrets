@@ -29,7 +29,8 @@ internal class ManageSecretsRootCommand : RootCommand
         ObfuscateOption obfuscateOption,
         EditorOption editorOption,
         ReadonlyOption readonlyOption,
-        EditorArgumentsArgument editorArgumentsArgument)
+        EditorArgumentsArgument editorArgumentsArgument,
+        OpenCliCommand openCliCommand)
     {
         Description = """
                       Manage dotnet user secrets with your editor and format of choice. 
@@ -59,6 +60,8 @@ internal class ManageSecretsRootCommand : RootCommand
         Add(_editorOption);
         Add(_readonlyOption);
         Add(_editorArgumentsArgument);
+
+        Add(openCliCommand);
 
         SetAction(ExecuteAction);
     }

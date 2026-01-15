@@ -24,6 +24,8 @@ internal static class CliServiceRegistrar
 
         sc.AddTransient<EditorArgumentsArgument>();
 
+        sc.AddTransient<OpenCliCommand>();
+
         sc.AddTransient<ManageSecretsRootCommand>();
     }
 }
