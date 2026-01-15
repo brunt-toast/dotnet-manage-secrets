@@ -1,7 +1,11 @@
-﻿using Dev.JoshBrunton.DotnetManageSecrets.Application.Requests.MainService;
+﻿using Dev.JoshBrunton.DotnetManageSecrets.Application.Enums;
+using Dev.JoshBrunton.DotnetManageSecrets.Application.Requests.MainService;
 using Dev.JoshBrunton.DotnetManageSecrets.Application.Results.MainService;
 using Dev.JoshBrunton.DotnetManageSecrets.Application.Services.FormatConverters;
 using Dev.JoshBrunton.DotnetManageSecrets.Application.Services.ProjectLocators;
+using Dev.JoshBrunton.DotnetManageSecrets.Application.Types;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Dev.JoshBrunton.DotnetManageSecrets.Application.Services;
 
@@ -53,7 +57,7 @@ internal class MainService : IMainService
         return new GetContentForUserEditResult(preppedContent, formatConverter.SuggestedFileExtension);
     }
 
-    public void SetUserSecretsContent(SetUserSecretsContentRequest request)
+    public Result<bool> SetUserSecretsContent(SetUserSecretsContentRequest request)
     {
         IProjectLocator locator = _projectLocatorFactory.GetLocator(request.ProjectQuery).Unwrap();
         IFormatConverter formatConverter = _formatConverterFactory.GetFilterForDataFormat(request.UserContentFormat).Unwrap();
@@ -63,13 +67,23 @@ internal class MainService : IMainService
         string folderLocation = _userSecretsFolderLocator.GetFolderForId(secretsId, request.EscapeWsl);
         string secretsFilePath = Path.Join(folderLocation, "secrets.json");
 
-        string preppedContent = formatConverter.Clean(request.UserContent).Unwrap();
-        _userSecretsWriter.Write(secretsFilePath, preppedContent);
+        string oldContent = _userSecretsReader.ReadUserSecrets(secretsFilePath).Unwrap();
+        string newContent = formatConverter.Clean(request.UserContent).Unwrap();
+
+        var oldJson = JsonConvert.DeserializeObject<Dictionary<string, object>>(oldContent) ?? [];
+        var newJson = JsonConvert.DeserializeObject<Dictionary<string, object>>(newContent) ?? [];
+        if (oldJson.Count == newJson.Count && oldJson.SequenceEqual(newJson))
+        {
+            return ErrorCodes.LogicalValueHasNotChanged;
+        }
+
+        _userSecretsWriter.Write(secretsFilePath, newContent);
+        return true;
     }
 }
 
 public interface IMainService
 {
     GetContentForUserEditResult GetContentForUserEdit(GetContentForUserEditRequest request);
-    void SetUserSecretsContent(SetUserSecretsContentRequest request);
+    Result<bool> SetUserSecretsContent(SetUserSecretsContentRequest request);
 }

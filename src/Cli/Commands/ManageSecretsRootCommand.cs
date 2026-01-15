@@ -104,8 +104,8 @@ internal class ManageSecretsRootCommand : RootCommand
             .GetOutputData(editContent.Content, editContent.SuggestedFileExtension, editor, editorArgs)
             .Unwrap();
 
-        _mainService.SetUserSecretsContent(new SetUserSecretsContentRequest(projectQuery, contentFromEditor, format, escapeWsl));
+        var result = _mainService.SetUserSecretsContent(new SetUserSecretsContentRequest(projectQuery, contentFromEditor, format, escapeWsl));
 
-        return 0;
+        return result.IsOk ? 0 : (int)result.Error!.Value;
     }
 }

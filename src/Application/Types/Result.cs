@@ -5,9 +5,9 @@ namespace Dev.JoshBrunton.DotnetManageSecrets.Application.Types;
 public class Result<T>
 {
     private T? _value;
-    private ErrorCodes? _err;
 
     public bool IsOk => _value is not null;
+    public ErrorCodes? Error { get; private set; }
 
     private Result()
     {
@@ -25,15 +25,15 @@ public class Result<T>
     {
         return new Result<T>
         {
-            _err = err
+            Error = err
         };
     }
 
     public T Unwrap()
     {
-        if (_err is not null)
+        if (Error is not null)
         {
-            Environment.Exit((int)_err);
+            Environment.Exit((int)Error);
         }
 
         return _value!;

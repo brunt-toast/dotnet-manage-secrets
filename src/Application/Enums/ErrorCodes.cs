@@ -8,4 +8,5 @@ public enum ErrorCodes
     ProjectNotRegisteredForUserSecrets = 4,
     FactoryHasNoSuitablePath = 5,
     UnknownError = 6,
+    LogicalValueHasNotChanged = 7,
 }
