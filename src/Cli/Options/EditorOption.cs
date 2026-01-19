@@ -22,6 +22,11 @@ internal class EditorOption : Option<string>
     {
         var fileName = opt.GetValue(this);
 
+        if (fileName == string.Empty)
+        {
+            return;
+        }
+
         if (fileName == null)
         {
             opt.AddError("The given editor was null.");
