@@ -10,6 +10,6 @@ public class SymbolTests
     [DynamicData(nameof(SymbolGenerator.GetSymbols), typeof(SymbolGenerator))]
     public void Description_ShouldNotBeBlank(Symbol symbol)
     {
-        Assert.IsFalse(string.IsNullOrWhiteSpace(symbol.Description));
+        Assert.IsFalse(string.IsNullOrWhiteSpace(symbol.Description), symbol.GetType().FullName);
     }
 }

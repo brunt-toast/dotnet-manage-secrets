@@ -30,7 +30,8 @@ internal class ManageSecretsRootCommand : RootCommand
         EditorOption editorOption,
         ReadonlyOption readonlyOption,
         EditorArgumentsArgument editorArgumentsArgument,
-        OpenCliCommand openCliCommand)
+        OpenCliCommand openCliCommand,
+        DiagnoseCommand diagnoseCommand)
     {
         Description = """
                       Manage dotnet user secrets with your editor and format of choice. 
@@ -62,6 +63,7 @@ internal class ManageSecretsRootCommand : RootCommand
         Add(_editorArgumentsArgument);
 
         Add(openCliCommand);
+        Add(diagnoseCommand);
 
         SetAction(ExecuteAction);
     }

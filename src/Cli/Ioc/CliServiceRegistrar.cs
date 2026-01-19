@@ -23,8 +23,10 @@ internal static class CliServiceRegistrar
         sc.AddTransient<ReadonlyOption>();
 
         sc.AddTransient<EditorArgumentsArgument>();
+        sc.AddTransient<ErrorCodeArgument>();
 
         sc.AddTransient<OpenCliCommand>();
+        sc.AddTransient<DiagnoseCommand>();
 
         sc.AddTransient<ManageSecretsRootCommand>();
     }
