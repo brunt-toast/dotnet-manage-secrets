@@ -52,8 +52,7 @@ internal class MainService : IMainService
             secretsContent = _valueObfuscator.Obfuscate(secretsContent);
         }
 
-        string preppedContent = formatConverter.Smudge(secretsContent).Unwrap();
-
+        string preppedContent = formatConverter.Clean(secretsContent).Unwrap();
         return new GetContentForUserEditResult(preppedContent, formatConverter.SuggestedFileExtension);
     }
 
@@ -68,7 +67,7 @@ internal class MainService : IMainService
         string secretsFilePath = Path.Join(folderLocation, "secrets.json");
 
         string oldContent = _userSecretsReader.ReadUserSecrets(secretsFilePath).Unwrap();
-        string newContent = formatConverter.Clean(request.UserContent).Unwrap();
+        string newContent = formatConverter.Smudge(request.UserContent).Unwrap();
 
         var oldJson = JsonConvert.DeserializeObject<Dictionary<string, object>>(oldContent) ?? [];
         var newJson = JsonConvert.DeserializeObject<Dictionary<string, object>>(newContent) ?? [];
