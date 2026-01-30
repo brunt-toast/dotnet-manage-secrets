@@ -2,25 +2,13 @@ name: Publish NuGet
 
 on:
   push:
-    tags: [ ci/*, version/* ]
+    tags: [ build/*, ci/*, version/*, v/* ]
   workflow_dispatch:
 
 jobs:
-  build:
-    name: Build and publish for ${{ matrix.os }}-${{ matrix.arch }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        include:
-          - os: ubuntu-latest
-            rid: linux-x64
-            arch: x64
-          - os: windows-latest
-            rid: win-x64
-            arch: x64
-          - os: windows-latest
-            rid: win-x86
-            arch: x86
+  get-version:
+    name: Get version
+    runs-on: ubuntu-latest
 
     outputs:
       version: ${{ steps.get_version.outputs.version }}
@@ -35,38 +23,19 @@ jobs:
           dotnet-version: '10.0.x'
 
       - name: Restore dependencies
-        run: dotnet restore src/DotnetManageSecrets/DotnetManageSecrets.csproj
+        run: dotnet restore src/Cli/Cli.csproj
 
       - name: Get project version
         id: get_version
         shell: bash
         run: |
-          VERSION=$(dotnet msbuild src/DotnetManageSecrets/DotnetManageSecrets.csproj -nologo -getproperty:Version | tail -n 1)
+          VERSION=$(dotnet msbuild src/Cli/Cli.csproj -nologo -getproperty:Version | tail -n 1)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-
-      - name: Publish ${{ matrix.rid }}
-        shell: bash
-        run: >
-          dotnet publish "src/DotnetManageSecrets/DotnetManageSecrets.csproj"
-          -c Release
-          -r "${{ matrix.rid }}"
-          --self-contained true
-          -p:PublishSingleFile=true
-          -p:PublishTrimmed=false
-          -p:IncludeNativeLibrariesForSelfExtract=true
-          -o "publish/${{ matrix.rid }}"
-
-      - name: Upload published artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: DotnetManageSecrets-${{ steps.get_version.outputs.version }}-${{ matrix.rid }}
-          path: publish/${{ matrix.rid }}/*
-
 
   pack:
     name: Create NuGet package
     runs-on: ubuntu-latest
-    needs: build
+    needs: get-version
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -78,14 +47,15 @@ jobs:
 
       - name: Pack NuGet package
         run: >
-          dotnet pack src/DotnetManageSecrets/DotnetManageSecrets.csproj
+          dotnet pack src/Cli/Cli.csproj
           -c Release
-          -p:PackageVersion=${{ needs.build.outputs.version }}
+          -p:PackageVersion=${{ needs.get-version.outputs.version }}
           -o ./artifacts/nuget
 
       - name: Upload NuGet package artifact
+        if: ${{ !env.ACT }}
         uses: actions/upload-artifact@v4
         with:
-          name: DotnetManageSecrets-NuGet-${{ needs.build.outputs.version }}
+          name: DotnetManageSecrets-NuGet-${{ needs.get-version.outputs.version }}
           path: artifacts/nuget/*.nupkg
 
