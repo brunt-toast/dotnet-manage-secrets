@@ -12,6 +12,6 @@ internal class Program
         CliServiceRegistrar.RegisterServices(sc);
         var sp = sc.BuildServiceProvider();
 
-        return sp.GetRequiredService<ManageSecretsRootCommand>().Execute(args);
+        return sp.GetRequiredService<RootDispatcherCommand>().Parse(args).Invoke();
     }
 }

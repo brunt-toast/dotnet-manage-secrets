@@ -27,7 +27,8 @@ internal static class CliServiceRegistrar
 
         sc.AddTransient<OpenCliCommand>();
         sc.AddTransient<DiagnoseCommand>();
+        sc.AddTransient<ManageSecretsCommand>();
 
-        sc.AddTransient<ManageSecretsRootCommand>();
+        sc.AddTransient<RootDispatcherCommand>();
     }
 }

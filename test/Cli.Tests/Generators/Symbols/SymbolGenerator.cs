@@ -16,7 +16,7 @@ internal static class SymbolGenerator
         IServiceCollection sc = new ServiceCollection();
         CliServiceRegistrar.RegisterServices(sc);
         IServiceProvider sp = sc.BuildServiceProvider();
-        RootCommand root = sp.GetRequiredService<ManageSecretsRootCommand>();
+        RootCommand root = sp.GetRequiredService<RootDispatcherCommand>();
 
         Stack<Symbol> stack = new Stack<Symbol>();
         stack.Push(root);

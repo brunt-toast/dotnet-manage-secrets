@@ -8,7 +8,7 @@ using Dev.JoshBrunton.DotnetManageSecrets.Cli.Services.GetOutputData;
 
 namespace Dev.JoshBrunton.DotnetManageSecrets.Cli.Commands;
 
-internal class ManageSecretsRootCommand : RootCommand
+internal class ManageSecretsCommand : Command
 {
     private readonly IMainService _mainService;
     private readonly IGetOutputDataFactory _getOutputDataFactory;
@@ -21,7 +21,7 @@ internal class ManageSecretsRootCommand : RootCommand
     private readonly ReadonlyOption _readonlyOption;
     private readonly EditorArgumentsArgument _editorArgumentsArgument;
 
-    public ManageSecretsRootCommand(IMainService mainService,
+    public ManageSecretsCommand(IMainService mainService,
         IGetOutputDataFactory getOutputDataFactory,
         ProjectQueryOption projectQueryOption,
         FormatOption formatOption,
@@ -31,7 +31,7 @@ internal class ManageSecretsRootCommand : RootCommand
         ReadonlyOption readonlyOption,
         EditorArgumentsArgument editorArgumentsArgument,
         OpenCliCommand openCliCommand,
-        DiagnoseCommand diagnoseCommand)
+        DiagnoseCommand diagnoseCommand) : base("manage-secrets")
     {
         Description = """
                       Manage dotnet user secrets with your editor and format of choice. 

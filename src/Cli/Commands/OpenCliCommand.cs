@@ -22,7 +22,7 @@ internal class OpenCliCommand : Command
 
     private int ExecuteAction(ParseResult _)
     {
-        var command = _serviceProvider.GetRequiredService<ManageSecretsRootCommand>()
+        var command = _serviceProvider.GetRequiredService<RootDispatcherCommand>()
             .Parse([]).CommandResult.Command;
 
         Console.WriteLine(OpenCliParser.GetOpenCliSpec(command,
