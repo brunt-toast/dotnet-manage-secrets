@@ -106,7 +106,7 @@ internal class ManageSecretsCommand : Command
             .GetOutputData(editContent.Content, editContent.SuggestedFileExtension, editor, editorArgs)
             .Unwrap();
 
-        var result = _mainService.SetUserSecretsContent(new SetUserSecretsContentRequest(projectQuery, contentFromEditor, format, escapeWsl));
+        var result = _mainService.SetUserSecretsContent(new SetUserSecretsContentRequest(editContent.SecretsFilePath, contentFromEditor, format));
 
         return result.IsOk ? 0 : (int)result.Error!.Value;
     }

@@ -11,9 +11,9 @@ internal class ProjectQueryOption : Option<string>
     {
         Validators.Add(PathExistsValidator);
         DefaultValueFactory = ValueFactory;
-        Description = "A .*proj file containing a single string matching \"<UserSecretsId>{guid}</UserSecretsId>\", " +
-                      "or a directory whose tree contains at least one such file. " +
-                      "In the case of a directory containing multiple such files, a selection prompt will appear.";
+        Description = "A .*proj file registered for user secrets, " +
+                      "or a directory whose tree contains at least one such project. " +
+                      "In the case of a directory containing multiple such projects, a selection prompt will appear.";
     }
 
     private void PathExistsValidator(OptionResult opt)
