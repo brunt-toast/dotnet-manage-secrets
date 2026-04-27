@@ -10,7 +10,7 @@ internal class DiagnoseCommand : Command
 {
     private readonly ErrorCodeArgument _errorCodeArgument;
 
-    public DiagnoseCommand(ErrorCodeArgument errorCodeArgument) : base("diagnose", "Diagnose an error in the program")
+    public DiagnoseCommand(ErrorCodeArgument errorCodeArgument) : base("diagnose", DiagnoseCommandResources.Description)
     {
         _errorCodeArgument = errorCodeArgument;
 
@@ -23,7 +23,7 @@ internal class DiagnoseCommand : Command
     {
         var errorCode = (ErrorCodes)arg.GetValue(_errorCodeArgument);
 
-        Console.WriteLine($"{GetDisplayName(errorCode)} ({(int)errorCode})");
+        Console.WriteLine($@"{GetDisplayName(errorCode)} ({(int)errorCode})");
         Console.WriteLine();
         Console.WriteLine(GetDescription(errorCode));
 

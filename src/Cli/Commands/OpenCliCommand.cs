@@ -13,7 +13,7 @@ internal class OpenCliCommand : Command
     private readonly IServiceProvider _serviceProvider;
 
     public OpenCliCommand(IServiceProvider serviceProvider) : 
-        base("opencli", "Gather information about this command in the OpenCLI format.")
+        base("opencli", OpenCliCommandResources.Description)
     {
         _serviceProvider = serviceProvider;
 

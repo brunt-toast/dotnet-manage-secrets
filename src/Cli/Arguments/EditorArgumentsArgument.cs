@@ -9,9 +9,7 @@ internal class EditorArgumentsArgument : Argument<List<string>>
 
     public EditorArgumentsArgument() : base("editorArgs")
     {
-        Description = """
-                      Arguments to pass to the editor. Any arguments common to this program and the editor may be escaped by adding them after " -- ". 
-                      """;
+        Description = EditorArgumentsArgumentResources.Description;
         Arity = ArgumentArity.ZeroOrMore;
         DefaultValueFactory = ValueFactory;
     }

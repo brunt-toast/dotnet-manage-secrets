@@ -33,15 +33,7 @@ internal class ManageSecretsCommand : Command
         OpenCliCommand openCliCommand,
         DiagnoseCommand diagnoseCommand) : base("manage-secrets")
     {
-        Description = """
-                      Manage dotnet user secrets with your editor and format of choice. 
-
-                      This program reads the user secrets ID of a given .NET project and looks for the associated file in the user secrets folder. It reads the secrets into a sensible format and presents them using the configured editor, then re-formats the edited file into .NET's expected schema before saving. 
-
-                      While editing, a copy of the secrets is stored in the system's temp directory. The file is deleted immediately after closing the editor and loading the new values into memory. Note that the file may persist if the program is not allowed to exit gracefully.
-
-                      TIP: You can configure default arguments to this command by using the file ~/.config/dotnet-manage-secrets.rsp. 
-                      """;
+        Description = ManageSecretsCommandResources.Description;
 
         _mainService = mainService;
         _getOutputDataFactory = getOutputDataFactory;

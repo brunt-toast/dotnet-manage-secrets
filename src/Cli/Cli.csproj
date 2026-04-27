@@ -28,10 +28,60 @@
 
   <ItemGroup>
     <PackageReference Include="System.CommandLine" Version="2.0.0-rc.1.25451.107" />
+    <PackageReference Include="Microsoft.Extensions.Localization" Version="10.0.3" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Application\Application.csproj" />
     <ProjectReference Include="..\LibOpenCli\LibOpenCli.csproj" />
   </ItemGroup>
+
+    <ItemGroup>
+    <EmbeddedResource Update="Resources/Languages/*.resx">
+      <Generator>MSBuild:Compile</Generator>
+      <LastGenOutput>%(Filename).Designer.cs</LastGenOutput>
+      <StronglyTypedFileName>$(MSBuildProjectDirectory)\Resources\Languages\%(Filename).Designer.cs</StronglyTypedFileName>
+      <StronglyTypedLanguage>CSharp</StronglyTypedLanguage>
+      <StronglyTypedNamespace>$(RootNamespace).Resources.Languages</StronglyTypedNamespace>
+      <StronglyTypedClassName>%(Filename)</StronglyTypedClassName>
+    </EmbeddedResource>
+  </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Resources\Languages\FormatOptionResources.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>FormatOptionResources.resx</DependentUpon>
+      </Compile>
+      <Compile Update="Resources\Languages\ObfuscateOptionResources.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>ObfuscateOptionResources.resx</DependentUpon>
+      </Compile>
+      <Compile Update="Resources\Languages\ProjectQueryOptionResources.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>ProjectQueryOptionResources.resx</DependentUpon>
+      </Compile>
+      <Compile Update="Resources\Languages\ReadonlyOptionResources.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>ReadonlyOptionResources.resx</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Update="Resources\Languages\FormatOptionResources.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\Languages\ObfuscateOptionResources.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\Languages\ProjectQueryOptionResources.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\Languages\ReadonlyOptionResources.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+      </EmbeddedResource>
+    </ItemGroup>
 </Project>

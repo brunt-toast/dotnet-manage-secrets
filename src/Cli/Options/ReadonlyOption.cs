@@ -9,7 +9,6 @@ internal class ReadonlyOption : Option<bool>
 {
     public ReadonlyOption() : base("--readonly", "-r")
     {
-        Description = "Format the secrets and send them to standard output, then exit; " +
-                      "don't launch an editor or accept piped input.";
+        Description = ReadonlyOptionResources.Description;
     }
 }

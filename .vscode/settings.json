@@ -12,6 +12,7 @@
         "**/obj/": true,
         "**/TestResults/": true,
         "**/BenchmarkDotNet.Artifacts/": true,
+        "**/*.Designer.cs": true,
     },
 
     "explorer.fileNesting.enabled": true,
@@ -19,5 +20,6 @@
     "explorer.fileNesting.patterns": {
         "*.csproj": "${capture}.csproj.User",
         "*.resx": "${capture}.*.resx",
+        "*.resx": "${capture}.Designer.cs",
     },
 }

@@ -11,6 +11,6 @@ internal class FormatOption : Option<DataFormats>
     public FormatOption() : base("--format", "-f")
     {
         DefaultValueFactory = ValueFactory;
-        Description = "The format with which to interact with the file.";
+        Description = FormatOptionResources.Description;
     }
 }

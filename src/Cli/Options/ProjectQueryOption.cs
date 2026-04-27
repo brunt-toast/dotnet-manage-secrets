@@ -1,19 +1,20 @@
 ﻿using System.CommandLine;
 using System.CommandLine.Parsing;
+using Microsoft.Extensions.Localization;
 
 namespace Dev.JoshBrunton.DotnetManageSecrets.Cli.Options;
 
 internal class ProjectQueryOption : Option<string>
 {
+    private readonly IStringLocalizer<ProjectQueryOptionResources> _localizer;
     private static string ValueFactory(ArgumentResult _) => Directory.GetCurrentDirectory();
 
-    public ProjectQueryOption() : base("--project", "-p")
+    public ProjectQueryOption(IStringLocalizer<ProjectQueryOptionResources> localizer) : base("--project", "-p")
     {
+        _localizer = localizer;
         Validators.Add(PathExistsValidator);
         DefaultValueFactory = ValueFactory;
-        Description = "A .*proj file registered for user secrets, " +
-                      "or a directory whose tree contains at least one such project. " +
-                      "In the case of a directory containing multiple such projects, a selection prompt will appear.";
+        Description = ProjectQueryOptionResources.Description;
     }
 
     private void PathExistsValidator(OptionResult opt)
@@ -21,7 +22,7 @@ internal class ProjectQueryOption : Option<string>
         string? value = opt.GetValue(this);
         if (!Path.Exists(value))
         {
-            opt.AddError($"The path \"{value}\" does not exist.");
+            opt.AddError(_localizer[ProjectQueryOptionResources.PathNotFound, value ?? string.Empty]);
         }
     }
 }
