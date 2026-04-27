@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.CommandLine;
-using System.Text;
+﻿using System.CommandLine;
 using Dev.JoshBrunton.DotnetManageSecrets.Application.Enums;
 using Dev.JoshBrunton.DotnetManageSecrets.LibOpenCli.Parser;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,7 +10,7 @@ internal class OpenCliCommand : Command
     private readonly IServiceProvider _serviceProvider;
 
     public OpenCliCommand(IServiceProvider serviceProvider) : 
-        base("opencli", "Gather information about this command in the OpenCLI format.")
+        base("opencli", OpenCliCommandResources.Description)
     {
         _serviceProvider = serviceProvider;
 

@@ -1,0 +1,9 @@
+{
+  "recommendations": [
+    "yzhang.markdown-all-in-one",
+    "cake-build.cake-vscode",
+    "jasonnutter.vscode-codeowners",
+    "ms-dotnettools.vscode-dotnet-runtime",
+    "dominicvonk.vscode-resx-editor",
+  ]
+}

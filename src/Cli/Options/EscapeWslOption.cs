@@ -1,14 +1,19 @@
 ﻿using System.CommandLine;
 using System.CommandLine.Parsing;
 using System.Runtime.InteropServices;
+using Microsoft.Extensions.Localization;
 
 namespace Dev.JoshBrunton.DotnetManageSecrets.Cli.Options;
 
 internal class EscapeWslOption: Option<bool>
 {
-    public EscapeWslOption() : base("--escape-wsl", "-w")
+    private readonly IStringLocalizer<EscapeWslOptionResources> _localizer;
+    private const string WslpathPath = "/usr/bin/wslpath";
+
+    public EscapeWslOption(IStringLocalizer<EscapeWslOptionResources> localizer) : base("--escape-wsl", "-w")
     {
-        Description = "If running in WSL, modify Windows' user-secrets files, not Linux's. Errors in non-WSL environments.";
+        _localizer = localizer;
+        Description = EscapeWslOptionResources.Description;
 
         Validators.Add(ValidateLinuxOsPlatform);
         Validators.Add(ValidateWslPathCommand);
@@ -16,7 +21,7 @@ internal class EscapeWslOption: Option<bool>
         Hidden = !(IsLinux() && CanResolveWslPathBin());
     }
 
-    private static void ValidateWslPathCommand(OptionResult opt)
+    private void ValidateWslPathCommand(OptionResult opt)
     {
         if (!opt.Tokens.Any())
         {
@@ -25,7 +30,7 @@ internal class EscapeWslOption: Option<bool>
 
         if (!CanResolveWslPathBin())
         {
-            opt.AddError("Couldn't find /usr/bin/wslpath. Are we really running in WSL?");
+            opt.AddError(_localizer[EscapeWslOptionResources.WslpathNotFound, WslpathPath]);
         }
     }
 
@@ -38,10 +43,10 @@ internal class EscapeWslOption: Option<bool>
 
         if (!IsLinux())
         {
-            opt.AddError($"{Name} can only be used in Linux environments.");
+            opt.AddError(_localizer[EscapeWslOptionResources.OnlyAvailableInLinux, Name]);
         }
     }
 
     private static bool IsLinux() => RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
-    private static bool CanResolveWslPathBin() => File.Exists("/usr/bin/wslpath");
+    private static bool CanResolveWslPathBin() => File.Exists(WslpathPath);
 }

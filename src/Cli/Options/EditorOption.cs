@@ -1,21 +1,20 @@
 ﻿using System.CommandLine;
 using System.CommandLine.Parsing;
+using Microsoft.Extensions.Localization;
 
 namespace Dev.JoshBrunton.DotnetManageSecrets.Cli.Options;
 
 internal class EditorOption : Option<string>
 {
+    private readonly IStringLocalizer<EditorOptionResources> _localizer;
     private static string ValueFactory(ArgumentResult _) => Environment.GetEnvironmentVariable("EDITOR") ?? "";
 
-    public EditorOption() : base("--editor", "-e")
+    public EditorOption(IStringLocalizer<EditorOptionResources> localizer) : base("--editor", "-e")
     {
+        _localizer = localizer;
         Validators.Add(ValueIsInvokableBinaryValidator);
         DefaultValueFactory = ValueFactory;
-        Description = """
-                      The command to invoke the editor. This can be a relative path, fully qualified path, or executable in $PATH. Shell aliases are not supported. The default value is the $EDITOR environment variable.
-                      
-                      If input has been redirected, e.g. by piping the output of another command into this one, this option is not checked and can be omitted. The value from the input stream will be run through the conversion logic and output to the user-secrets file.
-                      """;
+        Description = EditorOptionResources.Description;
     }
 
     private void ValueIsInvokableBinaryValidator(OptionResult opt)
@@ -29,7 +28,7 @@ internal class EditorOption : Option<string>
 
         if (fileName == null)
         {
-            opt.AddError("The given editor was null.");
+            opt.AddError(EditorOptionResources.EditorWasNull);
             return;
         }
 
@@ -46,6 +45,6 @@ internal class EditorOption : Option<string>
             return;
         }
 
-        opt.AddError($"Editor \"{fileName}\" was not a relative or fully qualified path, and was not in $PATH.");
+        opt.AddError(_localizer[EditorOptionResources.PathNotFound, fileName]);
     }
 }

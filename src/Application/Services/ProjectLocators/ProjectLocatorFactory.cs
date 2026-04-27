@@ -14,7 +14,7 @@ internal class ProjectLocatorFactory : IProjectLocatorFactory
 
         if (Directory.Exists(query))
         {
-            return new DirectorySearchProjectLocator(new UserSecretsIdLocator());
+            return new DirectorySearchProjectLocator();
         }
 
         return ErrorCodes.FactoryHasNoSuitablePath;

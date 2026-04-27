@@ -1,16 +1,20 @@
 ﻿using Dev.JoshBrunton.DotnetManageSecrets.Application.Enums;
 using System.CommandLine;
 using System.CommandLine.Parsing;
+using Microsoft.Extensions.Localization;
 
 namespace Dev.JoshBrunton.DotnetManageSecrets.Cli.Arguments;
 
 internal class ErrorCodeArgument : Argument<int>
 {
-    public ErrorCodeArgument() : base("errorcode")
+    private readonly IStringLocalizer<ErrorCodeArgumentResources> _localizer;
+
+    public ErrorCodeArgument(IStringLocalizer<ErrorCodeArgumentResources> localizer) : base("errorcode")
     {
+        _localizer = localizer;
         Arity = ArgumentArity.ExactlyOne;
 
-        Description = "A non-zero exit code returned by this program.";
+        Description = ErrorCodeArgumentResources.Description;
 
         Validators.Add(ValidateErrorCodes);
     }
@@ -21,8 +25,7 @@ internal class ErrorCodeArgument : Argument<int>
         ErrorCodes enumCode = Enum.GetValues<ErrorCodes>().FirstOrDefault(x => (int)x == intCode);
         if (enumCode == 0 && intCode != 0)
         {
-            obj.AddError($"Exit code {intCode} does not represent a known failure condition. " +
-                                    $"Could it have been thrown by the .NET runtime?");
+            obj.AddError(_localizer[ErrorCodeArgumentResources.ExitCodeNotKnown, intCode]);
         }
     }
 }

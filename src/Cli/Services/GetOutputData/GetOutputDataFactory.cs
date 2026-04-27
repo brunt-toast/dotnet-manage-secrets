@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Dev.JoshBrunton.DotnetManageSecrets.Cli.Services.GetOutputData;
+﻿namespace Dev.JoshBrunton.DotnetManageSecrets.Cli.Services.GetOutputData;
 
 internal class GetOutputDataFactory : IGetOutputDataFactory
 {

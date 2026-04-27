@@ -1,8 +1,5 @@
 ﻿using Dev.JoshBrunton.DotnetManageSecrets.Application.Enums;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text;
 using Dev.JoshBrunton.DotnetManageSecrets.Application.Types;
 
 namespace Dev.JoshBrunton.DotnetManageSecrets.Cli.Services.GetOutputData;

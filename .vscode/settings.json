@@ -1,0 +1,25 @@
+{
+    "files.associations": {
+        "nuget.config": "xml",
+        "Directory.Build.targets": "xml",
+        "*.rsp": "shellscript"
+    },
+
+    "files.exclude": {
+        "**/.git/": true,
+        "**/.vs/": true,
+        "**/bin/": true,
+        "**/obj/": true,
+        "**/TestResults/": true,
+        "**/BenchmarkDotNet.Artifacts/": true,
+        "**/*.Designer.cs": true,
+    },
+
+    "explorer.fileNesting.enabled": true,
+    "explorer.fileNesting.expand": false,
+    "explorer.fileNesting.patterns": {
+        "*.csproj": "${capture}.csproj.User",
+        "*.resx": "${capture}.*.resx",
+        "*.resx": "${capture}.Designer.cs",
+    },
+}

@@ -1,8 +1,6 @@
 ﻿using Dev.JoshBrunton.DotnetManageSecrets.Application.Enums;
 using Dev.JoshBrunton.DotnetManageSecrets.Application.Services.FormatConverters;
 using Dev.JoshBrunton.DotnetManageSecrets.Application.Tests.Generators.Enums;
-using Microsoft.VisualBasic;
-using System.Runtime.CompilerServices;
 
 namespace Dev.JoshBrunton.DotnetManageSecrets.Application.Tests.Tests.Services.FormatConverters;
 

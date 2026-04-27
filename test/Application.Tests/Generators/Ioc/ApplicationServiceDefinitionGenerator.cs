@@ -1,8 +1,5 @@
 ﻿using Dev.JoshBrunton.DotnetManageSecrets.Application.Ioc;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Dev.JoshBrunton.DotnetManageSecrets.Application.Tests.Generators.Ioc;
 

@@ -6,13 +6,6 @@ namespace Dev.JoshBrunton.DotnetManageSecrets.Application.Services.ProjectLocato
 
 internal class DirectorySearchProjectLocator : IProjectLocator
 {
-    private readonly IUserSecretsIdLocator _userSecretsIdLocator;
-
-    public DirectorySearchProjectLocator(IUserSecretsIdLocator userSecretsIdLocator)
-    {
-        _userSecretsIdLocator = userSecretsIdLocator;
-    }
-
     public Result<string> GetProjectPath(string query)
     {
         if (!Directory.Exists(query))
@@ -28,12 +21,15 @@ internal class DirectorySearchProjectLocator : IProjectLocator
         return Result<string>.Err(ErrorCodes.NoMatchingFiles);
     }
 
-    private bool TryGetProjectFromDirectory(string directory, [NotNullWhen(true)] out string? path)
+    private static bool TryGetProjectFromDirectory(string directory, [NotNullWhen(true)] out string? path)
     {
         path = null;
 
+        // Quick file-content check to filter candidates without spawning subprocesses.
+        // Covers both <UserSecretsId> in the project file and package/import references.
+        // The actual ID is resolved once by MainService after the project is selected.
         string[] projects = Directory.GetFiles(directory, "*.*proj", SearchOption.AllDirectories)
-            .Where(x => _userSecretsIdLocator.TryGetSecretsId(x).IsOk)
+            .Where(ProjectFileContainsUserSecretsId)
             .ToArray();
 
         if (projects.Length == 0)
@@ -72,5 +68,17 @@ internal class DirectorySearchProjectLocator : IProjectLocator
 
             Console.Error.WriteLine($"[{choiceString}] is not a valid option.");
         } while (true);
+    }
+
+    private static bool ProjectFileContainsUserSecretsId(string projectPath)
+    {
+        try
+        {
+            return File.ReadAllText(projectPath).Contains("UserSecretsId", StringComparison.OrdinalIgnoreCase);
+        }
+        catch
+        {
+            return false;
+        }
     }
 }

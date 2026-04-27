@@ -8,7 +8,7 @@ internal class RootDispatcherCommand : RootCommand
         DiagnoseCommand diagnoseCommand,
         OpenCliCommand openCliCommand)
     {
-        Description = "Core dispatcher command for dotnet-manage-secrets";
+        Description = RootDispatcherCommandResources.Description;
 
         TreatUnmatchedTokensAsErrors = false;
 

@@ -5,7 +5,6 @@ using Dev.JoshBrunton.DotnetManageSecrets.Application.Services.FormatConverters;
 using Dev.JoshBrunton.DotnetManageSecrets.Application.Services.ProjectLocators;
 using Dev.JoshBrunton.DotnetManageSecrets.Application.Types;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace Dev.JoshBrunton.DotnetManageSecrets.Application.Services;
 
@@ -53,20 +52,14 @@ internal class MainService : IMainService
         }
 
         string preppedContent = formatConverter.Clean(secretsContent).Unwrap();
-        return new GetContentForUserEditResult(preppedContent, formatConverter.SuggestedFileExtension);
+        return new GetContentForUserEditResult(preppedContent, formatConverter.SuggestedFileExtension, secretsFilePath);
     }
 
     public Result<bool> SetUserSecretsContent(SetUserSecretsContentRequest request)
     {
-        IProjectLocator locator = _projectLocatorFactory.GetLocator(request.ProjectQuery).Unwrap();
         IFormatConverter formatConverter = _formatConverterFactory.GetFilterForDataFormat(request.UserContentFormat).Unwrap();
 
-        string projectPath = locator.GetProjectPath(request.ProjectQuery).Unwrap();
-        string secretsId = _userSecretsIdLocator.TryGetSecretsId(projectPath).Unwrap();
-        string folderLocation = _userSecretsFolderLocator.GetFolderForId(secretsId, request.EscapeWsl);
-        string secretsFilePath = Path.Join(folderLocation, "secrets.json");
-
-        string oldContent = _userSecretsReader.ReadUserSecrets(secretsFilePath).Unwrap();
+        string oldContent = _userSecretsReader.ReadUserSecrets(request.SecretsFilePath).Unwrap();
         string newContent = formatConverter.Smudge(request.UserContent).Unwrap();
 
         var oldJson = JsonConvert.DeserializeObject<Dictionary<string, object>>(oldContent) ?? [];
@@ -76,7 +69,7 @@ internal class MainService : IMainService
             return ErrorCodes.LogicalValueHasNotChanged;
         }
 
-        _userSecretsWriter.Write(secretsFilePath, newContent);
+        _userSecretsWriter.Write(request.SecretsFilePath, newContent);
         return true;
     }
 }

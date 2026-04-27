@@ -4,16 +4,14 @@ namespace Dev.JoshBrunton.DotnetManageSecrets.Application.Requests.MainService;
 
 public sealed record SetUserSecretsContentRequest
 {
-    public string ProjectQuery { get; }
+    public string SecretsFilePath { get; }
     public string UserContent { get; }
     public DataFormats UserContentFormat { get; }
-    public bool EscapeWsl { get; }
 
-    public SetUserSecretsContentRequest(string projectQuery, string userContent, DataFormats userContentFormat, bool escapeWsl)
+    public SetUserSecretsContentRequest(string secretsFilePath, string userContent, DataFormats userContentFormat)
     {
-        ProjectQuery = projectQuery;
+        SecretsFilePath = secretsFilePath;
         UserContent = userContent;
         UserContentFormat = userContentFormat;
-        EscapeWsl = escapeWsl;
     }
 }
