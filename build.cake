@@ -27,8 +27,15 @@ Task("Install").Does(() =>
     }
 
     StartProcess("dotnet", "tool uninstall -g DotnetManageSecrets");
-    DotNetPack("./src/Cli", new DotNetPackSettings { Configuration = configuration });
-    DotNetTool($"tool install -g --add-source {nupkgDir} DotnetManageSecrets --allow-downgrade");
+
+    DotNetPack("./src/Cli", new DotNetPackSettings
+    {
+        Configuration = configuration,
+        OutputDirectory = nupkgDir
+    });
+
+    string absoluteNupkgDir = MakeAbsolute(Directory(nupkgDir)).FullPath;
+    StartProcess("dotnet", $"tool install -g --add-source {absoluteNupkgDir} DotnetManageSecrets --allow-downgrade");
 });
 
 RunTarget(target);
