@@ -24,7 +24,7 @@ Alternatively, [download the latest binaries from CI](https://github.com/brunt-t
 
 Or build, pack, and install from source: 
 ```sh
-git clone https://github.com/brunt-toast/dotnet-manage-secrets; cd dotnet-manage-secrets; make install 
+git clone https://github.com/brunt-toast/dotnet-manage-secrets; cd dotnet-manage-secrets; dotnet tool restore; dotnet cake --target Install 
 ```
 
 ## About
