@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Dev.JoshBrunton.DotnetManageSecrets.Application.Ioc;
+﻿using Dev.JoshBrunton.DotnetManageSecrets.Application.Ioc;
 using Dev.JoshBrunton.DotnetManageSecrets.Application.Tests.Generators.Ioc;
 using Microsoft.Extensions.DependencyInjection;
 

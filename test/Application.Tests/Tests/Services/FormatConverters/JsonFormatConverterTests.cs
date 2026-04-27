@@ -1,9 +1,4 @@
-using Dev.JoshBrunton.DotnetManageSecrets.Application.Enums;
 using Dev.JoshBrunton.DotnetManageSecrets.Application.Services.FormatConverters;
-using Dev.JoshBrunton.DotnetManageSecrets.Application.Tests.Generators.Enums;
-using Microsoft.VisualBasic;
-using System.Runtime.CompilerServices;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Dev.JoshBrunton.DotnetManageSecrets.Application.Tests.Tests.Services.FormatConverters;

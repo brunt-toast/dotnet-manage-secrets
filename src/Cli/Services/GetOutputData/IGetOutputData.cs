@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Dev.JoshBrunton.DotnetManageSecrets.Application.Types;
+﻿using Dev.JoshBrunton.DotnetManageSecrets.Application.Types;
 
 namespace Dev.JoshBrunton.DotnetManageSecrets.Cli.Services.GetOutputData;
 

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.CommandLine;
-using System.ComponentModel.Design;
-using System.Text;
+﻿using System.CommandLine;
 using Dev.JoshBrunton.DotnetManageSecrets.Cli.Commands;
 using Dev.JoshBrunton.DotnetManageSecrets.Cli.Ioc;
 using Microsoft.Extensions.DependencyInjection;

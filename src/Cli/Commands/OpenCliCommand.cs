@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.CommandLine;
-using System.Text;
+﻿using System.CommandLine;
 using Dev.JoshBrunton.DotnetManageSecrets.Application.Enums;
 using Dev.JoshBrunton.DotnetManageSecrets.LibOpenCli.Parser;
 using Microsoft.Extensions.DependencyInjection;
