@@ -27,4 +27,7 @@ public enum ErrorCodes
     
     [Display(Name = "Logical value has not changed", Description = "The logical value has not changed.")]
     LogicalValueHasNotChanged = 7,
+
+    [Display(Name = "Access violation", Description = "Tried to access a file system node, but didn't have permission.")]
+    AccessViolation = 8,
 }
