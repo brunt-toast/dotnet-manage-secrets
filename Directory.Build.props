@@ -3,7 +3,7 @@
         <CsprojName>$([System.IO.Path]::GetFileNameWithoutExtension($(MSBuildProjectFile)))</CsprojName>
         <RootNamespace>Dev.JoshBrunton.DotnetManageSecrets.$(CsprojName)</RootNamespace>
 
-        <Version>0.11.3</Version>
+        <Version>0.11.4</Version>
         <Deterministic>true</Deterministic>
         <NoWarn>CS2002</NoWarn>
     </PropertyGroup>
