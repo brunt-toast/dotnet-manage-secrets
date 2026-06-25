@@ -25,12 +25,22 @@ internal class DirectorySearchProjectLocator : IProjectLocator
     {
         path = null;
 
-        // Quick file-content check to filter candidates without spawning subprocesses.
-        // Covers both <UserSecretsId> in the project file and package/import references.
-        // The actual ID is resolved once by MainService after the project is selected.
-        string[] projects = Directory.GetFiles(directory, "*.*proj", SearchOption.AllDirectories)
-            .Where(ProjectFileContainsUserSecretsId)
-            .ToArray();
+        string[] projects;
+        try
+        {
+            // Quick file-content check to filter candidates without spawning subprocesses.
+            // Covers both <UserSecretsId> in the project file and package/import references.
+            // The actual ID is resolved once by MainService after the project is selected.
+            projects = Directory.GetFiles(directory, "*.*proj", SearchOption.AllDirectories)
+                .Where(ProjectFileContainsUserSecretsId)
+                .ToArray();
+        }
+        catch (UnauthorizedAccessException) 
+        {
+            Console.Error.WriteLine($"Not authorized to access {directory}. " +
+                                    $"Are you running this from/with the right directory?");
+            return false;
+        }
 
         if (projects.Length == 0)
         {
